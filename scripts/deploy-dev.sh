@@ -18,16 +18,16 @@ echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
 # Parar e remover container existente
 echo "🛑 Parando container de desenvolvimento existente..."
-docker stop $CONTAINER_NAME 2>/dev/null || true
-docker rm $CONTAINER_NAME 2>/dev/null || true
+docker stop "$CONTAINER_NAME" 2>/dev/null || true
+docker rm "$CONTAINER_NAME" 2>/dev/null || true
 
 # Remover imagem antiga
 echo "🗑️ Removendo imagem antiga..."
-docker rmi $IMAGE_NAME 2>/dev/null || true
+docker rmi "$IMAGE_NAME" 2>/dev/null || true
 
 # Baixar nova imagem
 echo "📥 Baixando nova imagem..."
-docker pull $IMAGE_NAME
+docker pull "$IMAGE_NAME"
 
 # Criar diretório de uploads se não existir
 echo "📁 Criando diretório de uploads..."
@@ -61,13 +61,13 @@ sleep 15
 
 # Verificar se o container está rodando
 echo "🔍 Verificando status do container..."
-if docker ps | grep -q $CONTAINER_NAME; then
+if docker ps | grep -q "$CONTAINER_NAME"; then
     echo "✅ Container de desenvolvimento está rodando!"
     echo "🌐 Aplicação disponível em: http://$(curl -s ifconfig.me):$PORT"
 else
     echo "❌ Erro: Container não está rodando!"
     echo "📋 Logs do container:"
-    docker logs $CONTAINER_NAME
+    docker logs "$CONTAINER_NAME"
     exit 1
 fi
 
