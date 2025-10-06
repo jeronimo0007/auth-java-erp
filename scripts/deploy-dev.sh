@@ -8,7 +8,7 @@ set -e
 echo "🚀 Iniciando deploy de desenvolvimento..."
 
 # Variáveis
-IMAGE_NAME="ghcr.io/SEU_USUARIO/SEU_REPOSITORIO:develop"
+IMAGE_NAME="ghcr.io/jeronimo0007/auth-java-erp:develop"
 CONTAINER_NAME="auth-dev"
 PORT="8081"
 
