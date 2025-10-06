@@ -91,7 +91,9 @@ Desktop.ini
 uploads/
 *.sql
 *.bat
-*.sh
+
+# Deploy scripts (manter no repositório)
+# *.sh
 
 # Environment variables
 .env

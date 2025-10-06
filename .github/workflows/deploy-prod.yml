@@ -1,0 +1,110 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Run tests
+      run: mvn clean test
+
+    - name: Build application
+      run: mvn clean package -DskipTests
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          # Login no GitHub Container Registry
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Parar container de produção se estiver rodando
+          docker stop auth-prod || true
+          docker rm auth-prod || true
+          
+          # Remover imagem antiga
+          docker rmi ghcr.io/${{ github.repository }}:latest || true
+          
+          # Baixar nova imagem
+          docker pull ghcr.io/${{ github.repository }}:latest
+          
+          # Executar novo container de produção
+          docker run -d \
+            --name auth-prod \
+            --restart unless-stopped \
+            -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e STORAGE_S3_NAME_SPACE=${{ secrets.STORAGE_S3_NAME_SPACE }} \
+            -e STORAGE_S3_ACCESS_KEY=${{ secrets.STORAGE_S3_ACCESS_KEY }} \
+            -e STORAGE_S3_SECRET_KEY=${{ secrets.STORAGE_S3_SECRET_KEY }} \
+            -e RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
+            -e RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }} \
+            -e RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }} \
+            -v /var/app/uploads:/app/uploads \
+            ghcr.io/${{ github.repository }}:latest
+          
+          # Limpar imagens não utilizadas
+          docker image prune -f
+          
+          # Verificar se o container está rodando
+          sleep 10
+          docker ps | grep auth-prod
