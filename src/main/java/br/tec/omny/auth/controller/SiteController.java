@@ -42,6 +42,16 @@ public class SiteController {
             @RequestParam("servicos") String servicos,
             @RequestParam(value = "servicos_imagens[]", required = false) MultipartFile[] servicosImagens,
             @RequestParam("logo_opcao") String logoOpcao,
+            @RequestParam("email_desejado") String emailDesejado,
+            @RequestParam("banner_opcao") String bannerOpcao,
+            @RequestParam("banner_secundario_opcao") String bannerSecundarioOpcao,
+            @RequestParam("banner_terciario_opcao") String bannerTerciarioOpcao,
+            @RequestParam(value = "banner_ia_descricao", required = false) String bannerIaDescricao,
+            @RequestParam(value = "banner_secundario_ia_descricao", required = false) String bannerSecundarioIaDescricao,
+            @RequestParam(value = "banner_terciario_ia_descricao", required = false) String bannerTerciarioIaDescricao,
+            @RequestParam(value = "banner_profissional_descricao", required = false) String bannerProfissionalDescricao,
+            @RequestParam(value = "banner_secundario_profissional_descricao", required = false) String bannerSecundarioProfissionalDescricao,
+            @RequestParam(value = "banner_terciario_profissional_descricao", required = false) String bannerTerciarioProfissionalDescricao,
             @RequestParam("email_empresa") String emailEmpresa,
             @RequestParam("telefone_empresa") String telefoneEmpresa,
             @RequestParam("endereco_empresa") String enderecoEmpresa,
@@ -87,6 +97,16 @@ public class SiteController {
                 request.setServicosImagens(java.util.Arrays.asList(servicosImagens));
             }
             request.setLogoOpcao(logoOpcao);
+            request.setEmailDesejado(emailDesejado);
+            request.setBannerOpcao(bannerOpcao);
+            request.setBannerSecundarioOpcao(bannerSecundarioOpcao);
+            request.setBannerTerciarioOpcao(bannerTerciarioOpcao);
+            request.setBannerIaDescricao(bannerIaDescricao);
+            request.setBannerSecundarioIaDescricao(bannerSecundarioIaDescricao);
+            request.setBannerTerciarioIaDescricao(bannerTerciarioIaDescricao);
+            request.setBannerProfissionalDescricao(bannerProfissionalDescricao);
+            request.setBannerSecundarioProfissionalDescricao(bannerSecundarioProfissionalDescricao);
+            request.setBannerTerciarioProfissionalDescricao(bannerTerciarioProfissionalDescricao);
             request.setEmailEmpresa(emailEmpresa);
             request.setTelefoneEmpresa(telefoneEmpresa);
             request.setEnderecoEmpresa(enderecoEmpresa);

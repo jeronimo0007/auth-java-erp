@@ -61,6 +61,31 @@ public class SiteRegisterRequest {
     @NotBlank(message = "Opção de logo é obrigatória (profissional ou IA)")
     private String logoOpcao;
     
+    @NotBlank(message = "Email desejado é obrigatório")
+    @Email(message = "Email desejado deve ter um formato válido")
+    private String emailDesejado;
+    
+    @NotBlank(message = "Opção do banner é obrigatória")
+    private String bannerOpcao;
+    
+    @NotBlank(message = "Opção do banner secundário é obrigatória")
+    private String bannerSecundarioOpcao;
+    
+    @NotBlank(message = "Opção do banner terciário é obrigatória")
+    private String bannerTerciarioOpcao;
+    
+    private String bannerIaDescricao;
+    
+    private String bannerSecundarioIaDescricao;
+    
+    private String bannerTerciarioIaDescricao;
+    
+    private String bannerProfissionalDescricao;
+    
+    private String bannerSecundarioProfissionalDescricao;
+    
+    private String bannerTerciarioProfissionalDescricao;
+    
     @NotBlank(message = "Email da empresa é obrigatório")
     @Email(message = "Email da empresa deve ter um formato válido")
     private String emailEmpresa;
@@ -273,6 +298,86 @@ public class SiteRegisterRequest {
 
     public void setLogoOpcao(String logoOpcao) {
         this.logoOpcao = logoOpcao;
+    }
+    
+    public String getEmailDesejado() {
+        return emailDesejado;
+    }
+    
+    public void setEmailDesejado(String emailDesejado) {
+        this.emailDesejado = emailDesejado;
+    }
+    
+    public String getBannerOpcao() {
+        return bannerOpcao;
+    }
+    
+    public void setBannerOpcao(String bannerOpcao) {
+        this.bannerOpcao = bannerOpcao;
+    }
+    
+    public String getBannerSecundarioOpcao() {
+        return bannerSecundarioOpcao;
+    }
+    
+    public void setBannerSecundarioOpcao(String bannerSecundarioOpcao) {
+        this.bannerSecundarioOpcao = bannerSecundarioOpcao;
+    }
+    
+    public String getBannerTerciarioOpcao() {
+        return bannerTerciarioOpcao;
+    }
+    
+    public void setBannerTerciarioOpcao(String bannerTerciarioOpcao) {
+        this.bannerTerciarioOpcao = bannerTerciarioOpcao;
+    }
+    
+    public String getBannerIaDescricao() {
+        return bannerIaDescricao;
+    }
+    
+    public void setBannerIaDescricao(String bannerIaDescricao) {
+        this.bannerIaDescricao = bannerIaDescricao;
+    }
+    
+    public String getBannerSecundarioIaDescricao() {
+        return bannerSecundarioIaDescricao;
+    }
+    
+    public void setBannerSecundarioIaDescricao(String bannerSecundarioIaDescricao) {
+        this.bannerSecundarioIaDescricao = bannerSecundarioIaDescricao;
+    }
+    
+    public String getBannerTerciarioIaDescricao() {
+        return bannerTerciarioIaDescricao;
+    }
+    
+    public void setBannerTerciarioIaDescricao(String bannerTerciarioIaDescricao) {
+        this.bannerTerciarioIaDescricao = bannerTerciarioIaDescricao;
+    }
+    
+    public String getBannerProfissionalDescricao() {
+        return bannerProfissionalDescricao;
+    }
+    
+    public void setBannerProfissionalDescricao(String bannerProfissionalDescricao) {
+        this.bannerProfissionalDescricao = bannerProfissionalDescricao;
+    }
+    
+    public String getBannerSecundarioProfissionalDescricao() {
+        return bannerSecundarioProfissionalDescricao;
+    }
+    
+    public void setBannerSecundarioProfissionalDescricao(String bannerSecundarioProfissionalDescricao) {
+        this.bannerSecundarioProfissionalDescricao = bannerSecundarioProfissionalDescricao;
+    }
+    
+    public String getBannerTerciarioProfissionalDescricao() {
+        return bannerTerciarioProfissionalDescricao;
+    }
+    
+    public void setBannerTerciarioProfissionalDescricao(String bannerTerciarioProfissionalDescricao) {
+        this.bannerTerciarioProfissionalDescricao = bannerTerciarioProfissionalDescricao;
     }
     
     public String getEmailEmpresa() {

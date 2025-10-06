@@ -282,6 +282,16 @@ public class AuthService {
         site.setQuemSomos(request.getQuemSomos());
         site.setServicos(request.getServicos());
         site.setLogoOpcao(request.getLogoOpcao());
+        site.setEmailDesejado(request.getEmailDesejado());
+        site.setBannerOpcao(request.getBannerOpcao());
+        site.setBannerSecundarioOpcao(request.getBannerSecundarioOpcao());
+        site.setBannerTerciarioOpcao(request.getBannerTerciarioOpcao());
+        site.setBannerIaDescricao(request.getBannerIaDescricao());
+        site.setBannerSecundarioIaDescricao(request.getBannerSecundarioIaDescricao());
+        site.setBannerTerciarioIaDescricao(request.getBannerTerciarioIaDescricao());
+        site.setBannerProfissionalDescricao(request.getBannerProfissionalDescricao());
+        site.setBannerSecundarioProfissionalDescricao(request.getBannerSecundarioProfissionalDescricao());
+        site.setBannerTerciarioProfissionalDescricao(request.getBannerTerciarioProfissionalDescricao());
         site.setEmailEmpresa(request.getEmailEmpresa());
         site.setTelefoneEmpresa(request.getTelefoneEmpresa());
         site.setEnderecoEmpresa(request.getEnderecoEmpresa());
