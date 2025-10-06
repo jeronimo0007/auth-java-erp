@@ -12,6 +12,7 @@ IMAGE_NAME="ghcr.io/jeronimo0007/auth-java-erp:develop"
 CONTAINER_NAME="auth-dev"
 PORT="8081"
 
+
 # Login no GitHub Container Registry
 echo "🔐 Fazendo login no GitHub Container Registry..."
 echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
