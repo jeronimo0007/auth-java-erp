@@ -1,5 +1,5 @@
 # Multi-stage build para otimizar o tamanho da imagem
-FROM maven:3.9.6-openjdk-17-slim AS build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 # Definir diretório de trabalho
 WORKDIR /app
