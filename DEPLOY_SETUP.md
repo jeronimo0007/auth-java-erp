@@ -55,6 +55,11 @@ Adicione os seguintes secrets:
 | `VPS_USERNAME` | Usuário do VPS | `root` ou `ubuntu` |
 | `VPS_SSH_KEY` | Chave SSH privada | Conteúdo do `~/.ssh/id_rsa` |
 | `VPS_PORT` | Porta SSH | `22` |
+| `DB_URL` | URL do banco de dados | `jdbc:mysql://195.200.1.59:3306/app_omny?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true` |
+| `DB_USERNAME` | Usuário do banco | `api` |
+| `DB_PASSWORD` | Senha do banco | `c6m8n4d2d3` |
+| `JWT_SECRET` | Chave secreta JWT | `mySecretKey123456789012345678901234567890` |
+| `JWT_EXPIRATION` | Expiração JWT (segundos) | `86400` |
 | `STORAGE_S3_NAME_SPACE` | Nome do bucket S3 | `meu-bucket` |
 | `STORAGE_S3_ACCESS_KEY` | Access Key do S3 | `AKIA...` |
 | `STORAGE_S3_SECRET_KEY` | Secret Key do S3 | `wJalr...` |
