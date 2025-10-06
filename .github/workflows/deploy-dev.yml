@@ -71,22 +71,42 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          # Baixar e executar script de deploy
-          curl -fsSL https://raw.githubusercontent.com/jeronimo0007/auth-java-erp/main/scripts/deploy-dev-fixed.sh -o deploy-dev.sh
-          chmod +x deploy-dev.sh
+          # Login no GitHub Container Registry
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           
-          # Executar deploy
-          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-          GITHUB_ACTOR="${{ github.actor }}" \
-          DB_URL="${{ secrets.DB_URL }}" \
-          DB_USERNAME="${{ secrets.DB_USERNAME }}" \
-          DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-          JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-          JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}" \
-          STORAGE_S3_NAME_SPACE="${{ secrets.STORAGE_S3_NAME_SPACE }}" \
-          STORAGE_S3_ACCESS_KEY="${{ secrets.STORAGE_S3_ACCESS_KEY }}" \
-          STORAGE_S3_SECRET_KEY="${{ secrets.STORAGE_S3_SECRET_KEY }}" \
-          RABBITMQ_HOST="${{ secrets.RABBITMQ_HOST }}" \
-          RABBITMQ_USERNAME="${{ secrets.RABBITMQ_USERNAME }}" \
-          RABBITMQ_PASSWORD="${{ secrets.RABBITMQ_PASSWORD }}" \
-          ./deploy-dev.sh
+          # Parar container de desenvolvimento se estiver rodando
+          docker stop auth-dev || true
+          docker rm auth-dev || true
+          
+          # Remover imagem antiga
+          docker rmi ghcr.io/${{ github.repository }}:develop || true
+          
+          # Baixar nova imagem
+          docker pull ghcr.io/${{ github.repository }}:develop
+          
+          # Executar novo container de desenvolvimento
+          docker run -d \
+            --name auth-dev \
+            --restart unless-stopped \
+            -p 8081:8080 \
+            -e SPRING_PROFILES_ACTIVE=dev \
+            -e DB_URL=${{ secrets.DB_URL }} \
+            -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
+            -e STORAGE_S3_NAME_SPACE=${{ secrets.STORAGE_S3_NAME_SPACE }} \
+            -e STORAGE_S3_ACCESS_KEY=${{ secrets.STORAGE_S3_ACCESS_KEY }} \
+            -e STORAGE_S3_SECRET_KEY=${{ secrets.STORAGE_S3_SECRET_KEY }} \
+            -e RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
+            -e RABBITMQ_USERNAME=${{ secrets.RABBITMQ_USERNAME }} \
+            -e RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }} \
+            -v /var/app/uploads-dev:/app/uploads \
+            ghcr.io/${{ github.repository }}:develop
+          
+          # Limpar imagens não utilizadas
+          docker image prune -f
+          
+          # Verificar se o container está rodando
+          sleep 10
+          docker ps | grep auth-dev
