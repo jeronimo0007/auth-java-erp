@@ -53,7 +53,7 @@ docker run -d \
   -e RABBITMQ_USERNAME="$RABBITMQ_USERNAME" \
   -e RABBITMQ_PASSWORD="$RABBITMQ_PASSWORD" \
   -v /var/app/uploads-dev:/app/uploads \
-  $IMAGE_NAME
+  "$IMAGE_NAME"
 
 # Aguardar aplicação inicializar
 echo "⏳ Aguardando aplicação inicializar..."
