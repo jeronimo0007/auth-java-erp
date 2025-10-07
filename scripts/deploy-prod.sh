@@ -8,7 +8,7 @@ set -e
 echo "🚀 Iniciando deploy de produção..."
 
 # Variáveis
-IMAGE_NAME="ghcr.io/SEU_USUARIO/SEU_REPOSITORIO:latest"
+IMAGE_NAME="ghcr.io/jeronimo0007/auth-java-erp:latest"
 CONTAINER_NAME="auth-prod"
 PORT="8080"
 
@@ -41,6 +41,11 @@ docker run -d \
   --restart unless-stopped \
   -p $PORT:8080 \
   -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_URL="$DB_URL" \
+  -e DB_USERNAME="$DB_USERNAME" \
+  -e DB_PASSWORD="$DB_PASSWORD" \
+  -e JWT_SECRET="$JWT_SECRET" \
+  -e JWT_EXPIRATION="$JWT_EXPIRATION" \
   -e STORAGE_S3_NAME_SPACE="$STORAGE_S3_NAME_SPACE" \
   -e STORAGE_S3_ACCESS_KEY="$STORAGE_S3_ACCESS_KEY" \
   -e STORAGE_S3_SECRET_KEY="$STORAGE_S3_SECRET_KEY" \
@@ -48,7 +53,7 @@ docker run -d \
   -e RABBITMQ_USERNAME="$RABBITMQ_USERNAME" \
   -e RABBITMQ_PASSWORD="$RABBITMQ_PASSWORD" \
   -v /var/app/uploads:/app/uploads \
-  $IMAGE_NAME
+  "$IMAGE_NAME"
 
 # Aguardar aplicação inicializar
 echo "⏳ Aguardando aplicação inicializar..."

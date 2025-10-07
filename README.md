@@ -2,6 +2,17 @@
 
 Este projeto implementa um sistema de autenticação usando Spring Boot com MySQL, compatível com o sistema de hash de senhas do PHP.
 
+**Repositório:** [jeronimo0007/auth-java-erp](https://github.com/jeronimo0007/auth-java-erp)
+
+## 🚀 Deploy Automático
+
+Este projeto está configurado com deploy automático via GitHub Actions para VPS:
+
+- **Merge para `main`** → Deploy automático em produção (porta 8080)
+- **Merge para `develop`** → Deploy automático em desenvolvimento (porta 8081)
+
+📖 **Guia completo de deploy:** [README_DEPLOY.md](README_DEPLOY.md)
+
 ## Configuração do Banco de Dados
 
 ### Pré-requisitos
