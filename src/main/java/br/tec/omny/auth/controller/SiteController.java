@@ -32,10 +32,7 @@ public class SiteController {
             @RequestParam("publico_alvo") String publicoAlvo,
             @RequestParam("banner_texto") String bannerTexto,
             @RequestParam(value = "banner_texto_img", required = false) MultipartFile bannerTextoImg,
-            @RequestParam(value = "banner_secundario", required = false) String bannerSecundario,
-            @RequestParam(value = "banner_secundario_img", required = false) MultipartFile bannerSecundarioImg,
-            @RequestParam(value = "banner_terciario", required = false) String bannerTerciario,
-            @RequestParam(value = "banner_terciario_img", required = false) MultipartFile bannerTerciarioImg,
+            
             @RequestParam("tipo_site") String tipoSite,
             @RequestParam("quem_somos") String quemSomos,
             @RequestParam(value = "empresa_imagem", required = false) MultipartFile empresaImagem,
@@ -44,14 +41,9 @@ public class SiteController {
             @RequestParam("logo_opcao") String logoOpcao,
             @RequestParam("email_desejado") String emailDesejado,
             @RequestParam("banner_opcao") String bannerOpcao,
-            @RequestParam("banner_secundario_opcao") String bannerSecundarioOpcao,
-            @RequestParam("banner_terciario_opcao") String bannerTerciarioOpcao,
             @RequestParam(value = "banner_ia_descricao", required = false) String bannerIaDescricao,
-            @RequestParam(value = "banner_secundario_ia_descricao", required = false) String bannerSecundarioIaDescricao,
-            @RequestParam(value = "banner_terciario_ia_descricao", required = false) String bannerTerciarioIaDescricao,
+            
             @RequestParam(value = "banner_profissional_descricao", required = false) String bannerProfissionalDescricao,
-            @RequestParam(value = "banner_secundario_profissional_descricao", required = false) String bannerSecundarioProfissionalDescricao,
-            @RequestParam(value = "banner_terciario_profissional_descricao", required = false) String bannerTerciarioProfissionalDescricao,
             @RequestParam("email_empresa") String emailEmpresa,
             @RequestParam("telefone_empresa") String telefoneEmpresa,
             @RequestParam("endereco_empresa") String enderecoEmpresa,
@@ -85,10 +77,7 @@ public class SiteController {
             request.setPublicoAlvo(publicoAlvo);
             request.setBannerTexto(bannerTexto);
             request.setBannerTextoImg(bannerTextoImg);
-            request.setBannerSecundario(bannerSecundario);
-            request.setBannerSecundarioImg(bannerSecundarioImg);
-            request.setBannerTerciario(bannerTerciario);
-            request.setBannerTerciarioImg(bannerTerciarioImg);
+            
             request.setTipoSite(tipoSite);
             request.setQuemSomos(quemSomos);
             request.setEmpresaImagem(empresaImagem);
@@ -99,14 +88,10 @@ public class SiteController {
             request.setLogoOpcao(logoOpcao);
             request.setEmailDesejado(emailDesejado);
             request.setBannerOpcao(bannerOpcao);
-            request.setBannerSecundarioOpcao(bannerSecundarioOpcao);
-            request.setBannerTerciarioOpcao(bannerTerciarioOpcao);
+            
             request.setBannerIaDescricao(bannerIaDescricao);
-            request.setBannerSecundarioIaDescricao(bannerSecundarioIaDescricao);
-            request.setBannerTerciarioIaDescricao(bannerTerciarioIaDescricao);
+            
             request.setBannerProfissionalDescricao(bannerProfissionalDescricao);
-            request.setBannerSecundarioProfissionalDescricao(bannerSecundarioProfissionalDescricao);
-            request.setBannerTerciarioProfissionalDescricao(bannerTerciarioProfissionalDescricao);
             request.setEmailEmpresa(emailEmpresa);
             request.setTelefoneEmpresa(telefoneEmpresa);
             request.setEnderecoEmpresa(enderecoEmpresa);

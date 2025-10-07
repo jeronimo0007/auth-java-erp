@@ -38,6 +38,15 @@ public class FileUploadService {
     @Value("${storage.s3.secret_key}")
     private String secretKey;
 
+    @Value("${app.upload.max-file-bytes:5242880}")
+    private long maxFileBytes;
+
+    @Value("${app.upload.max-file-count:20}")
+    private int maxFileCount;
+
+    @Value("${app.upload.allowed-types:image/jpeg,image/png,image/webp,application/pdf}")
+    private String allowedTypesCsv;
+
     private S3Client buildClient() {
         return S3Client.builder()
             .endpointOverride(URI.create(endpoint))
@@ -57,6 +66,31 @@ public class FileUploadService {
         }
 
         String originalFilename = file.getOriginalFilename();
+
+        // Validate content type
+        if (allowedTypesCsv != null && !allowedTypesCsv.isBlank()) {
+            boolean allowed = java.util.Arrays.stream(allowedTypesCsv.split(","))
+                .map(String::trim)
+                .anyMatch(type -> type.equalsIgnoreCase(file.getContentType()));
+            if (!allowed) {
+                throw new IllegalArgumentException(
+                    "Arquivo '" + (originalFilename == null ? "(sem nome)" : originalFilename) +
+                    "' possui tipo não permitido: " + file.getContentType() +
+                    ". Permitidos: " + allowedTypesCsv
+                );
+            }
+        }
+
+        // Validate size
+        if (file.getSize() > maxFileBytes) {
+            double sizeMb = (file.getSize() / 1024.0 / 1024.0);
+            double maxMb = (maxFileBytes / 1024.0 / 1024.0);
+            throw new IllegalArgumentException(
+                "Arquivo '" + (originalFilename == null ? "(sem nome)" : originalFilename) +
+                "' excede o limite de tamanho: " + String.format("%.2f", sizeMb) + " MB (máx " + String.format("%.2f", maxMb) + " MB)"
+            );
+        }
+
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -85,6 +119,12 @@ public class FileUploadService {
     public List<String> uploadFiles(List<MultipartFile> files, String keyPrefix) throws IOException {
         List<String> urls = new ArrayList<>();
         if (files == null) return urls;
+
+        if (files.size() > maxFileCount) {
+            throw new IllegalArgumentException(
+                "Quantidade de arquivos excede o limite: " + files.size() + " (máx " + maxFileCount + ")"
+            );
+        }
         for (MultipartFile file : files) {
             String url = uploadFile(file, keyPrefix);
             if (url != null) {

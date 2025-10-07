@@ -277,21 +277,16 @@ public class AuthService {
         site.setDescricaoNegocio(request.getDescricaoNegocio());
         site.setPublicoAlvo(request.getPublicoAlvo());
         site.setBannerTexto(request.getBannerTexto());
-        site.setBannerSecundario(request.getBannerSecundario());
-        site.setBannerTerciario(request.getBannerTerciario());
+        
         site.setQuemSomos(request.getQuemSomos());
         site.setServicos(request.getServicos());
         site.setLogoOpcao(request.getLogoOpcao());
         site.setEmailDesejado(request.getEmailDesejado());
         site.setBannerOpcao(request.getBannerOpcao());
-        site.setBannerSecundarioOpcao(request.getBannerSecundarioOpcao());
-        site.setBannerTerciarioOpcao(request.getBannerTerciarioOpcao());
+        
         site.setBannerIaDescricao(request.getBannerIaDescricao());
-        site.setBannerSecundarioIaDescricao(request.getBannerSecundarioIaDescricao());
-        site.setBannerTerciarioIaDescricao(request.getBannerTerciarioIaDescricao());
+        
         site.setBannerProfissionalDescricao(request.getBannerProfissionalDescricao());
-        site.setBannerSecundarioProfissionalDescricao(request.getBannerSecundarioProfissionalDescricao());
-        site.setBannerTerciarioProfissionalDescricao(request.getBannerTerciarioProfissionalDescricao());
         site.setEmailEmpresa(request.getEmailEmpresa());
         site.setTelefoneEmpresa(request.getTelefoneEmpresa());
         site.setEnderecoEmpresa(request.getEnderecoEmpresa());
@@ -318,8 +313,7 @@ public class AuthService {
         String logoPath = null;
         String faviconUrl = null;
         String bannerTextoImgUrl = null;
-        String bannerSecundarioImgUrl = null;
-        String bannerTerciarioImgUrl = null;
+        
         List<String> servicosImagensPaths = null;
         
         try {
@@ -348,14 +342,7 @@ public class AuthService {
                 bannerTextoImgUrl = fileUploadService.uploadFile(request.getBannerTextoImg(), "erp/sites/" + site.getSiteId() + "/banners");
                 site.setBannerTextoImg(bannerTextoImgUrl);
             }
-            if (request.getBannerSecundarioImg() != null && !request.getBannerSecundarioImg().isEmpty()) {
-                bannerSecundarioImgUrl = fileUploadService.uploadFile(request.getBannerSecundarioImg(), "erp/sites/" + site.getSiteId() + "/banners");
-                site.setBannerSecundarioImg(bannerSecundarioImgUrl);
-            }
-            if (request.getBannerTerciarioImg() != null && !request.getBannerTerciarioImg().isEmpty()) {
-                bannerTerciarioImgUrl = fileUploadService.uploadFile(request.getBannerTerciarioImg(), "erp/sites/" + site.getSiteId() + "/banners");
-                site.setBannerTerciarioImg(bannerTerciarioImgUrl);
-            }
+            
         } catch (IOException e) {
             // Continua sem interromper o cadastro do site (evita rollback da transação)
         }
@@ -411,12 +398,7 @@ public class AuthService {
         
         projectDescription.append("CONTEÚDO DO SITE:\n");
         projectDescription.append("• Banner Principal: ").append(request.getBannerTexto()).append("\n");
-        if (request.getBannerSecundario() != null && !request.getBannerSecundario().trim().isEmpty()) {
-            projectDescription.append("• Banner Secundário: ").append(request.getBannerSecundario()).append("\n");
-        }
-        if (request.getBannerTerciario() != null && !request.getBannerTerciario().trim().isEmpty()) {
-            projectDescription.append("• Banner Terciário: ").append(request.getBannerTerciario()).append("\n");
-        }
+        
         projectDescription.append("• Política de Banners: Caso o cliente não envie imagens de banner, gerar automaticamente um banner com base em cor_principal (\"")
             .append(request.getCorPrincipal()).append("\"), cor_secundaria (\"")
             .append(request.getCorSecundaria()).append("\") e estilo (\"")
@@ -459,12 +441,7 @@ public class AuthService {
         if (bannerTextoImgUrl != null) {
             projectDescription.append("• Banner Principal (imagem): ").append(bannerTextoImgUrl).append("\n");
         }
-        if (bannerSecundarioImgUrl != null) {
-            projectDescription.append("• Banner Secundário (imagem): ").append(bannerSecundarioImgUrl).append("\n");
-        }
-        if (bannerTerciarioImgUrl != null) {
-            projectDescription.append("• Banner Terciário (imagem): ").append(bannerTerciarioImgUrl).append("\n");
-        }
+        
         if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
             projectDescription.append("• Imagens dos Serviços: ").append(String.join(", ", servicosImagensPaths)).append("\n");
         }
@@ -519,12 +496,7 @@ public class AuthService {
         
         taskDescription.append("2. CONTEÚDO:\n");
         taskDescription.append("   • Banner Principal: ").append(request.getBannerTexto()).append("\n");
-        if (request.getBannerSecundario() != null && !request.getBannerSecundario().trim().isEmpty()) {
-            taskDescription.append("   • Banner Secundário: ").append(request.getBannerSecundario()).append("\n");
-        }
-        if (request.getBannerTerciario() != null && !request.getBannerTerciario().trim().isEmpty()) {
-            taskDescription.append("   • Banner Terciário: ").append(request.getBannerTerciario()).append("\n");
-        }
+        
         taskDescription.append("   • Caso nenhuma imagem de banner seja fornecida, CRIAR automaticamente um banner com base nas cores especificadas (cor_principal: \"")
             .append(request.getCorPrincipal()).append("\", cor_secundaria: \"")
             .append(request.getCorSecundaria()).append("\") e estilo: \"")
@@ -571,12 +543,7 @@ public class AuthService {
         if (bannerTextoImgUrl != null) {
             taskDescription.append("   • Banner Principal (imagem): ").append(bannerTextoImgUrl).append("\n");
         }
-        if (bannerSecundarioImgUrl != null) {
-            taskDescription.append("   • Banner Secundário (imagem): ").append(bannerSecundarioImgUrl).append("\n");
-        }
-        if (bannerTerciarioImgUrl != null) {
-            taskDescription.append("   • Banner Terciário (imagem): ").append(bannerTerciarioImgUrl).append("\n");
-        }
+        
         if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
             taskDescription.append("   • Imagens dos Serviços: ").append(String.join(", ", servicosImagensPaths)).append("\n");
         }
@@ -732,9 +699,36 @@ public class AuthService {
         taskFatura.setDescription(taskFaturaDescription.toString());
         taskRepository.save(taskFatura);
         
-        // Envia mensagem para fila MQ com site_id e contexto
-        String contexto = "Site criado: " + request.getNomeSite() + " (" + request.getDominio() + ") - " + request.getTipoSite();
-        queueService.sendSiteCreationMessage(site.getSiteId(), contexto);
+        // Envia mensagem para fila MQ com site_id e contexto (detalhado, texto plano)
+        StringBuilder ctx = new StringBuilder();
+        ctx.append("Site criado\n");
+        ctx.append("Empresa: ").append(request.getCompany()).append("\n");
+        ctx.append("Nome do site: ").append(request.getNomeSite()).append("\n");
+        ctx.append("Domínio: ").append(request.getDominio()).append("\n");
+        ctx.append("Tipo: ").append(request.getTipoSite()).append("\n");
+        if (request.getDescricaoNegocio() != null) ctx.append("Descrição do negócio: ").append(request.getDescricaoNegocio()).append("\n");
+        if (request.getPublicoAlvo() != null) ctx.append("Público-alvo: ").append(request.getPublicoAlvo()).append("\n");
+        if (request.getBannerTexto() != null) ctx.append("Banner (texto): ").append(request.getBannerTexto()).append("\n");
+        if (site.getBannerTextoImg() != null) ctx.append("Banner (imagem): ").append(site.getBannerTextoImg()).append("\n");
+        if (request.getQuemSomos() != null) ctx.append("Quem somos: ").append(request.getQuemSomos()).append("\n");
+        if (request.getServicos() != null) ctx.append("Serviços: ").append(request.getServicos()).append("\n");
+        if (site.getLogo() != null) ctx.append("Logo (URL): ").append(site.getLogo()).append("\n");
+        if (site.getFavicon() != null) ctx.append("Favicon (URL): ").append(site.getFavicon()).append("\n");
+        if (request.getCorPrincipal() != null) ctx.append("Cor principal: ").append(request.getCorPrincipal()).append("\n");
+        if (request.getCorSecundaria() != null) ctx.append("Cor secundária: ").append(request.getCorSecundaria()).append("\n");
+        if (request.getEstilo() != null) ctx.append("Estilo: ").append(request.getEstilo()).append("\n");
+        if (request.getEmailDesejado() != null) ctx.append("Email desejado: ").append(request.getEmailDesejado()).append("\n");
+        if (request.getEmailEmpresa() != null) ctx.append("Email empresa: ").append(request.getEmailEmpresa()).append("\n");
+        if (request.getTelefoneEmpresa() != null) ctx.append("Telefone: ").append(request.getTelefoneEmpresa()).append("\n");
+        if (request.getEnderecoEmpresa() != null) ctx.append("Endereço: ").append(request.getEnderecoEmpresa()).append("\n");
+        ctx.append("Logo (opção): ").append(request.getLogoOpcao()).append("\n");
+        ctx.append("Banner (opção): ").append(request.getBannerOpcao()).append("\n");
+        if (request.getBannerIaDescricao() != null) ctx.append("Banner IA (descrição): ").append(request.getBannerIaDescricao()).append("\n");
+        if (request.getBannerProfissionalDescricao() != null) ctx.append("Banner Profissional (descrição): ").append(request.getBannerProfissionalDescricao()).append("\n");
+        if (site.getEmpresaImagem() != null) ctx.append("Empresa imagem (URL): ").append(site.getEmpresaImagem()).append("\n");
+        if (site.getServicosImagens() != null) ctx.append("Serviços imagens (URLs): ").append(site.getServicosImagens()).append("\n");
+
+        queueService.sendSiteCreationMessage(site.getSiteId(), ctx.toString());
         
         return client;
     }

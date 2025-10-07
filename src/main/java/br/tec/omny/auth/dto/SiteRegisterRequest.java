@@ -33,14 +33,11 @@ public class SiteRegisterRequest {
     @NotBlank(message = "Texto do banner é obrigatório")
     private String bannerTexto;
     
-    private String bannerSecundario;
     
-    private String bannerTerciario;
 
     // Imagens dos banners (opcionais)
     private org.springframework.web.multipart.MultipartFile bannerTextoImg;
-    private org.springframework.web.multipart.MultipartFile bannerSecundarioImg;
-    private org.springframework.web.multipart.MultipartFile bannerTerciarioImg;
+    
 
     // Favicon opcional
     private org.springframework.web.multipart.MultipartFile favicon;
@@ -68,23 +65,15 @@ public class SiteRegisterRequest {
     @NotBlank(message = "Opção do banner é obrigatória")
     private String bannerOpcao;
     
-    @NotBlank(message = "Opção do banner secundário é obrigatória")
-    private String bannerSecundarioOpcao;
     
-    @NotBlank(message = "Opção do banner terciário é obrigatória")
-    private String bannerTerciarioOpcao;
     
     private String bannerIaDescricao;
     
-    private String bannerSecundarioIaDescricao;
     
-    private String bannerTerciarioIaDescricao;
     
     private String bannerProfissionalDescricao;
     
-    private String bannerSecundarioProfissionalDescricao;
     
-    private String bannerTerciarioProfissionalDescricao;
     
     @NotBlank(message = "Email da empresa é obrigatório")
     @Email(message = "Email da empresa deve ter um formato válido")
@@ -213,21 +202,7 @@ public class SiteRegisterRequest {
         this.bannerTextoImg = bannerTextoImg;
     }
 
-    public org.springframework.web.multipart.MultipartFile getBannerSecundarioImg() {
-        return bannerSecundarioImg;
-    }
-
-    public void setBannerSecundarioImg(org.springframework.web.multipart.MultipartFile bannerSecundarioImg) {
-        this.bannerSecundarioImg = bannerSecundarioImg;
-    }
-
-    public org.springframework.web.multipart.MultipartFile getBannerTerciarioImg() {
-        return bannerTerciarioImg;
-    }
-
-    public void setBannerTerciarioImg(org.springframework.web.multipart.MultipartFile bannerTerciarioImg) {
-        this.bannerTerciarioImg = bannerTerciarioImg;
-    }
+    
 
     public org.springframework.web.multipart.MultipartFile getFavicon() {
         return favicon;
@@ -236,21 +211,7 @@ public class SiteRegisterRequest {
     public void setFavicon(org.springframework.web.multipart.MultipartFile favicon) {
         this.favicon = favicon;
     }
-    public String getBannerSecundario() {
-        return bannerSecundario;
-    }
     
-    public void setBannerSecundario(String bannerSecundario) {
-        this.bannerSecundario = bannerSecundario;
-    }
-    
-    public String getBannerTerciario() {
-        return bannerTerciario;
-    }
-    
-    public void setBannerTerciario(String bannerTerciario) {
-        this.bannerTerciario = bannerTerciario;
-    }
     
     public String getTipoSite() {
         return tipoSite;
@@ -316,21 +277,7 @@ public class SiteRegisterRequest {
         this.bannerOpcao = bannerOpcao;
     }
     
-    public String getBannerSecundarioOpcao() {
-        return bannerSecundarioOpcao;
-    }
     
-    public void setBannerSecundarioOpcao(String bannerSecundarioOpcao) {
-        this.bannerSecundarioOpcao = bannerSecundarioOpcao;
-    }
-    
-    public String getBannerTerciarioOpcao() {
-        return bannerTerciarioOpcao;
-    }
-    
-    public void setBannerTerciarioOpcao(String bannerTerciarioOpcao) {
-        this.bannerTerciarioOpcao = bannerTerciarioOpcao;
-    }
     
     public String getBannerIaDescricao() {
         return bannerIaDescricao;
@@ -340,21 +287,7 @@ public class SiteRegisterRequest {
         this.bannerIaDescricao = bannerIaDescricao;
     }
     
-    public String getBannerSecundarioIaDescricao() {
-        return bannerSecundarioIaDescricao;
-    }
     
-    public void setBannerSecundarioIaDescricao(String bannerSecundarioIaDescricao) {
-        this.bannerSecundarioIaDescricao = bannerSecundarioIaDescricao;
-    }
-    
-    public String getBannerTerciarioIaDescricao() {
-        return bannerTerciarioIaDescricao;
-    }
-    
-    public void setBannerTerciarioIaDescricao(String bannerTerciarioIaDescricao) {
-        this.bannerTerciarioIaDescricao = bannerTerciarioIaDescricao;
-    }
     
     public String getBannerProfissionalDescricao() {
         return bannerProfissionalDescricao;
@@ -364,21 +297,7 @@ public class SiteRegisterRequest {
         this.bannerProfissionalDescricao = bannerProfissionalDescricao;
     }
     
-    public String getBannerSecundarioProfissionalDescricao() {
-        return bannerSecundarioProfissionalDescricao;
-    }
     
-    public void setBannerSecundarioProfissionalDescricao(String bannerSecundarioProfissionalDescricao) {
-        this.bannerSecundarioProfissionalDescricao = bannerSecundarioProfissionalDescricao;
-    }
-    
-    public String getBannerTerciarioProfissionalDescricao() {
-        return bannerTerciarioProfissionalDescricao;
-    }
-    
-    public void setBannerTerciarioProfissionalDescricao(String bannerTerciarioProfissionalDescricao) {
-        this.bannerTerciarioProfissionalDescricao = bannerTerciarioProfissionalDescricao;
-    }
     
     public String getEmailEmpresa() {
         return emailEmpresa;
