@@ -43,17 +43,7 @@ public class Site {
     @Column(name = "banner_texto_img", length = 500)
     private String bannerTextoImg;
 
-    @Column(name = "banner_secundario", columnDefinition = "TEXT")
-    private String bannerSecundario;
-
-    @Column(name = "banner_secundario_img", length = 500)
-    private String bannerSecundarioImg;
-
-    @Column(name = "banner_terciario", columnDefinition = "TEXT")
-    private String bannerTerciario;
-
-    @Column(name = "banner_terciario_img", length = 500)
-    private String bannerTerciarioImg;
+    
 
     @Column(name = "quem_somos", columnDefinition = "TEXT")
     private String quemSomos;
@@ -69,6 +59,24 @@ public class Site {
 
     @Column(name = "logo_opcao", length = 20)
     private String logoOpcao; // valores esperados: "profissional" ou "IA"
+
+    @Column(name = "email_desejado", length = 255)
+    private String emailDesejado;
+
+    @Column(name = "banner_opcao", length = 20)
+    private String bannerOpcao;
+
+    
+
+    @Column(name = "banner_ia_descricao", columnDefinition = "TEXT")
+    private String bannerIaDescricao;
+
+    
+
+    @Column(name = "banner_profissional_descricao", columnDefinition = "TEXT")
+    private String bannerProfissionalDescricao;
+
+    
 
     @Column(name = "email_empresa", length = 255)
     private String emailEmpresa;

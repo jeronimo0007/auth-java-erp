@@ -33,14 +33,11 @@ public class SiteRegisterRequest {
     @NotBlank(message = "Texto do banner é obrigatório")
     private String bannerTexto;
     
-    private String bannerSecundario;
     
-    private String bannerTerciario;
 
     // Imagens dos banners (opcionais)
     private org.springframework.web.multipart.MultipartFile bannerTextoImg;
-    private org.springframework.web.multipart.MultipartFile bannerSecundarioImg;
-    private org.springframework.web.multipart.MultipartFile bannerTerciarioImg;
+    
 
     // Favicon opcional
     private org.springframework.web.multipart.MultipartFile favicon;
@@ -60,6 +57,23 @@ public class SiteRegisterRequest {
 
     @NotBlank(message = "Opção de logo é obrigatória (profissional ou IA)")
     private String logoOpcao;
+    
+    @NotBlank(message = "Email desejado é obrigatório")
+    @Email(message = "Email desejado deve ter um formato válido")
+    private String emailDesejado;
+    
+    @NotBlank(message = "Opção do banner é obrigatória")
+    private String bannerOpcao;
+    
+    
+    
+    private String bannerIaDescricao;
+    
+    
+    
+    private String bannerProfissionalDescricao;
+    
+    
     
     @NotBlank(message = "Email da empresa é obrigatório")
     @Email(message = "Email da empresa deve ter um formato válido")
@@ -188,21 +202,7 @@ public class SiteRegisterRequest {
         this.bannerTextoImg = bannerTextoImg;
     }
 
-    public org.springframework.web.multipart.MultipartFile getBannerSecundarioImg() {
-        return bannerSecundarioImg;
-    }
-
-    public void setBannerSecundarioImg(org.springframework.web.multipart.MultipartFile bannerSecundarioImg) {
-        this.bannerSecundarioImg = bannerSecundarioImg;
-    }
-
-    public org.springframework.web.multipart.MultipartFile getBannerTerciarioImg() {
-        return bannerTerciarioImg;
-    }
-
-    public void setBannerTerciarioImg(org.springframework.web.multipart.MultipartFile bannerTerciarioImg) {
-        this.bannerTerciarioImg = bannerTerciarioImg;
-    }
+    
 
     public org.springframework.web.multipart.MultipartFile getFavicon() {
         return favicon;
@@ -211,21 +211,7 @@ public class SiteRegisterRequest {
     public void setFavicon(org.springframework.web.multipart.MultipartFile favicon) {
         this.favicon = favicon;
     }
-    public String getBannerSecundario() {
-        return bannerSecundario;
-    }
     
-    public void setBannerSecundario(String bannerSecundario) {
-        this.bannerSecundario = bannerSecundario;
-    }
-    
-    public String getBannerTerciario() {
-        return bannerTerciario;
-    }
-    
-    public void setBannerTerciario(String bannerTerciario) {
-        this.bannerTerciario = bannerTerciario;
-    }
     
     public String getTipoSite() {
         return tipoSite;
@@ -274,6 +260,44 @@ public class SiteRegisterRequest {
     public void setLogoOpcao(String logoOpcao) {
         this.logoOpcao = logoOpcao;
     }
+    
+    public String getEmailDesejado() {
+        return emailDesejado;
+    }
+    
+    public void setEmailDesejado(String emailDesejado) {
+        this.emailDesejado = emailDesejado;
+    }
+    
+    public String getBannerOpcao() {
+        return bannerOpcao;
+    }
+    
+    public void setBannerOpcao(String bannerOpcao) {
+        this.bannerOpcao = bannerOpcao;
+    }
+    
+    
+    
+    public String getBannerIaDescricao() {
+        return bannerIaDescricao;
+    }
+    
+    public void setBannerIaDescricao(String bannerIaDescricao) {
+        this.bannerIaDescricao = bannerIaDescricao;
+    }
+    
+    
+    
+    public String getBannerProfissionalDescricao() {
+        return bannerProfissionalDescricao;
+    }
+    
+    public void setBannerProfissionalDescricao(String bannerProfissionalDescricao) {
+        this.bannerProfissionalDescricao = bannerProfissionalDescricao;
+    }
+    
+    
     
     public String getEmailEmpresa() {
         return emailEmpresa;

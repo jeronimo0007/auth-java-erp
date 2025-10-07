@@ -32,16 +32,18 @@ public class SiteController {
             @RequestParam("publico_alvo") String publicoAlvo,
             @RequestParam("banner_texto") String bannerTexto,
             @RequestParam(value = "banner_texto_img", required = false) MultipartFile bannerTextoImg,
-            @RequestParam(value = "banner_secundario", required = false) String bannerSecundario,
-            @RequestParam(value = "banner_secundario_img", required = false) MultipartFile bannerSecundarioImg,
-            @RequestParam(value = "banner_terciario", required = false) String bannerTerciario,
-            @RequestParam(value = "banner_terciario_img", required = false) MultipartFile bannerTerciarioImg,
+            
             @RequestParam("tipo_site") String tipoSite,
             @RequestParam("quem_somos") String quemSomos,
             @RequestParam(value = "empresa_imagem", required = false) MultipartFile empresaImagem,
             @RequestParam("servicos") String servicos,
             @RequestParam(value = "servicos_imagens[]", required = false) MultipartFile[] servicosImagens,
             @RequestParam("logo_opcao") String logoOpcao,
+            @RequestParam("email_desejado") String emailDesejado,
+            @RequestParam("banner_opcao") String bannerOpcao,
+            @RequestParam(value = "banner_ia_descricao", required = false) String bannerIaDescricao,
+            
+            @RequestParam(value = "banner_profissional_descricao", required = false) String bannerProfissionalDescricao,
             @RequestParam("email_empresa") String emailEmpresa,
             @RequestParam("telefone_empresa") String telefoneEmpresa,
             @RequestParam("endereco_empresa") String enderecoEmpresa,
@@ -75,10 +77,7 @@ public class SiteController {
             request.setPublicoAlvo(publicoAlvo);
             request.setBannerTexto(bannerTexto);
             request.setBannerTextoImg(bannerTextoImg);
-            request.setBannerSecundario(bannerSecundario);
-            request.setBannerSecundarioImg(bannerSecundarioImg);
-            request.setBannerTerciario(bannerTerciario);
-            request.setBannerTerciarioImg(bannerTerciarioImg);
+            
             request.setTipoSite(tipoSite);
             request.setQuemSomos(quemSomos);
             request.setEmpresaImagem(empresaImagem);
@@ -87,6 +86,12 @@ public class SiteController {
                 request.setServicosImagens(java.util.Arrays.asList(servicosImagens));
             }
             request.setLogoOpcao(logoOpcao);
+            request.setEmailDesejado(emailDesejado);
+            request.setBannerOpcao(bannerOpcao);
+            
+            request.setBannerIaDescricao(bannerIaDescricao);
+            
+            request.setBannerProfissionalDescricao(bannerProfissionalDescricao);
             request.setEmailEmpresa(emailEmpresa);
             request.setTelefoneEmpresa(telefoneEmpresa);
             request.setEnderecoEmpresa(enderecoEmpresa);

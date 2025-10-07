@@ -33,8 +33,7 @@ WORKDIR /app
 # Copiar JAR da aplicação
 COPY --from=build /app/target/*.jar app.jar
 
-# Criar diretório para uploads
-RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
+# Não criamos diretório local de uploads: arquivos vão para S3/Spaces
 
 # Mudar para usuário não-root
 USER appuser

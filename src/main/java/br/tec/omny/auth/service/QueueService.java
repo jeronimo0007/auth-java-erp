@@ -25,15 +25,15 @@ public class QueueService {
     /**
      * Envia mensagem para a fila de criação de site
      * @param siteId ID do site criado
-     * @param contexto Contexto/descrição do site
+     * @param contexto Contexto/descrição do site (texto plano)
      */
     public void sendSiteCreationMessage(Integer siteId, String contexto) {
         try {
-            SiteCreationMessage message = new SiteCreationMessage(siteId, contexto);
+            // Envia como String (texto plano) para facilitar consumo
+            String payload = "site_id=" + siteId + "\n" + contexto;
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, payload);
             
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, message);
-            
-            logger.info("Mensagem enviada para fila de criação de site - Site ID: {}, Exchange: {}, Routing Key: {}", 
+            logger.info("Mensagem (String) enviada para fila de criação de site - Site ID: {}, Exchange: {}, Routing Key: {}", 
                        siteId, exchangeName, routingKey);
                        
         } catch (Exception e) {

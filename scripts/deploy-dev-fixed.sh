@@ -29,11 +29,6 @@ docker rmi "$IMAGE_NAME" 2>/dev/null || true
 echo "📥 Baixando nova imagem..."
 docker pull "$IMAGE_NAME"
 
-# Criar diretório de uploads se não existir
-echo "📁 Criando diretório de uploads..."
-sudo mkdir -p /var/app/uploads-dev
-sudo chown -R 1000:1000 /var/app/uploads-dev
-
 # Executar novo container
 echo "🏃 Executando novo container de desenvolvimento..."
 docker run -d \
@@ -52,7 +47,6 @@ docker run -d \
   -e RABBITMQ_HOST="$RABBITMQ_HOST" \
   -e RABBITMQ_USERNAME="$RABBITMQ_USERNAME" \
   -e RABBITMQ_PASSWORD="$RABBITMQ_PASSWORD" \
-  -v /var/app/uploads-dev:/app/uploads \
   "$IMAGE_NAME"
 
 # Aguardar aplicação inicializar
