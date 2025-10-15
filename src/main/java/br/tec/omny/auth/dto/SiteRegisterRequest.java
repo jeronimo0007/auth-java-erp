@@ -3,34 +3,27 @@ package br.tec.omny.auth.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
+import br.tec.omny.auth.validation.ValidationGroups;
 
 import java.util.List;
 
 public class SiteRegisterRequest {
     
-    @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email deve ter um formato válido")
     private String email;
     
-    @NotBlank(message = "Celular é obrigatório")
     private String phonenumber;
     
-    @NotBlank(message = "Empresa é obrigatória")
     private String company;
     
-    @NotBlank(message = "Nome do site é obrigatório")
     private String nomeSite;
     
-    @NotBlank(message = "Domínio é obrigatório")
     private String dominio;
     
-    @NotBlank(message = "Descrição do negócio é obrigatória")
     private String descricaoNegocio;
     
-    @NotBlank(message = "Público alvo é obrigatório")
     private String publicoAlvo;
     
-    @NotBlank(message = "Texto do banner é obrigatório")
     private String bannerTexto;
     
     
@@ -42,27 +35,21 @@ public class SiteRegisterRequest {
     // Favicon opcional
     private org.springframework.web.multipart.MultipartFile favicon;
     
-    @NotBlank(message = "Tipo do site é obrigatório")
     private String tipoSite;
     
-    @NotBlank(message = "Quem somos é obrigatório")
     private String quemSomos;
     
     private MultipartFile empresaImagem;
     
-    @NotBlank(message = "Serviços são obrigatórios")
     private String servicos;
     
     private List<MultipartFile> servicosImagens;
 
-    @NotBlank(message = "Opção de logo é obrigatória (profissional ou IA)")
     private String logoOpcao;
     
-    @NotBlank(message = "Email desejado é obrigatório")
     @Email(message = "Email desejado deve ter um formato válido")
     private String emailDesejado;
     
-    @NotBlank(message = "Opção do banner é obrigatória")
     private String bannerOpcao;
     
     
@@ -75,45 +62,33 @@ public class SiteRegisterRequest {
     
     
     
-    @NotBlank(message = "Email da empresa é obrigatório")
     @Email(message = "Email da empresa deve ter um formato válido")
     private String emailEmpresa;
     
-    @NotBlank(message = "Telefone da empresa é obrigatório")
     private String telefoneEmpresa;
     
-    @NotBlank(message = "Endereço da empresa é obrigatório")
     private String enderecoEmpresa;
     
-    @NotBlank(message = "Título da seção 1 é obrigatório")
     private String secao1Titulo;
     
-    @NotBlank(message = "Conteúdo da seção 1 é obrigatório")
     private String secao1Conteudo;
     
-    @NotBlank(message = "Título da seção 2 é obrigatório")
     private String secao2Titulo;
     
-    @NotBlank(message = "Conteúdo da seção 2 é obrigatório")
     private String secao2Conteudo;
     
     private MultipartFile logo;
     
-    @NotBlank(message = "Cor principal é obrigatória")
     private String corPrincipal;
     
-    @NotBlank(message = "Cor secundária é obrigatória")
     private String corSecundaria;
     
-    @NotBlank(message = "Estilo é obrigatório")
     private String estilo;
     
     private String observacoes;
     
-    @NotBlank(message = "Primeiro nome é obrigatório")
     private String firstname;
     
-    @NotBlank(message = "Último nome é obrigatório")
     private String lastname;
     
     private String facebook;
@@ -125,6 +100,17 @@ public class SiteRegisterRequest {
     private String tiktok;
     
     private String instagram;
+    
+    // Novos campos
+    private String preference;
+    
+    @NotBlank(message = "Descrição do site é obrigatória quando preference é 'descricao'", groups = {ValidationGroups.DescriptionRequired.class})
+    private String descriptionSite;
+    
+    private String typeSite;
+    private Long userId; // Para validar se cliente já existe
+    
+    private String password; // Senha do usuário
     
     // Construtores
     public SiteRegisterRequest() {}
@@ -449,5 +435,45 @@ public class SiteRegisterRequest {
     
     public void setInstagram(String instagram) {
         this.instagram = instagram;
+    }
+    
+    public String getPreference() {
+        return preference;
+    }
+    
+    public void setPreference(String preference) {
+        this.preference = preference;
+    }
+    
+    public String getDescriptionSite() {
+        return descriptionSite;
+    }
+    
+    public void setDescriptionSite(String descriptionSite) {
+        this.descriptionSite = descriptionSite;
+    }
+    
+    public String getTypeSite() {
+        return typeSite;
+    }
+    
+    public void setTypeSite(String typeSite) {
+        this.typeSite = typeSite;
+    }
+    
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

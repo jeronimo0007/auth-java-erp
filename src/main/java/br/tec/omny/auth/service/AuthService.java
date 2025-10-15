@@ -2,6 +2,7 @@ package br.tec.omny.auth.service;
 
 import br.tec.omny.auth.dto.AdminLoginRequest;
 import br.tec.omny.auth.dto.AdminLoginResponse;
+import br.tec.omny.auth.dto.ClientInfoResponse;
 import br.tec.omny.auth.dto.LoginRequest;
 import br.tec.omny.auth.dto.RegisterRequest;
 import br.tec.omny.auth.dto.SiteRegisterRequest;
@@ -23,6 +24,7 @@ import br.tec.omny.auth.repository.SiteImageRepository;
 import br.tec.omny.auth.util.JwtUtil;
 import br.tec.omny.auth.util.PasswordHash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +71,10 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
     
-    private final PasswordHash passwordHash = new PasswordHash(8, true);
+    @Value("${app.site.max-sites-per-client:3}")
+    private int maxSitesPerClient;
+    
+    private final PasswordHash passwordHash = new PasswordHash(8, false);
     
     /**
      * Registra um novo usuário
@@ -240,33 +245,150 @@ public class AuthService {
      * @throws Exception Se houver erro no registro
      */
     public Client registerSite(SiteRegisterRequest request) throws Exception {
-        // Verifica se o email já existe
-        if (contactRepository.existsByEmail(request.getEmail())) {
-            throw new Exception("Email já está em uso");
+        Client client;
+        Contact contact;
+        
+        // Validações baseadas no preference
+        if ("descricao".equals(request.getPreference())) {
+            // Se preference == "descricao", description_site é obrigatório
+            if (request.getDescriptionSite() == null || request.getDescriptionSite().trim().isEmpty()) {
+                throw new Exception("Descrição do site é obrigatória quando preference é 'descricao'");
+            }
         }
         
-        // Cria o cliente
-        Client client = new Client();
-        client.setCompany(request.getCompany());
-        client.setPhoneNumber(request.getPhonenumber());
-        client.setActive(true);
-        client.setDefaultClient(true);
+        // Validação de password obrigatório apenas quando não existe user_id
+        if (request.getUserId() == null) {
+            if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+                throw new Exception("Senha é obrigatória para novos clientes");
+            }
+        }
+        // Se user_id existe, não valida nem altera a senha
+        
+        // Verifica se user_id foi fornecido
+        if (request.getUserId() != null) {
+            // Valida se o cliente existe
+            Optional<Client> existingClientOpt = clientRepository.findById(request.getUserId());
+            if (existingClientOpt.isPresent()) {
+                // Cliente existe - usa o cliente existente
+                client = existingClientOpt.get();
+                
+                // Se user_id existe, firstName, lastName, phoneNumber e email são obrigatórios
+                if (request.getFirstname() == null || request.getFirstname().trim().isEmpty()) {
+                    throw new Exception("Primeiro nome é obrigatório quando user_id é fornecido");
+                }
+                if (request.getLastname() == null || request.getLastname().trim().isEmpty()) {
+                    throw new Exception("Último nome é obrigatório quando user_id é fornecido");
+                }
+                if (request.getPhonenumber() == null || request.getPhonenumber().trim().isEmpty()) {
+                    throw new Exception("Telefone é obrigatório quando user_id é fornecido");
+                }
+                if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+                    throw new Exception("Email é obrigatório quando user_id é fornecido");
+                }
+                
+                // Atualiza o company com a concatenação de firstName e lastName
+                client.setCompany(request.getFirstname() + " " + request.getLastname());
+                client.setPhoneNumber(request.getPhonenumber());
+                
+                // Salva as alterações do cliente
+                client = clientRepository.save(client);
+                
+                // Busca o contato primário existente do cliente
+                Optional<Contact> existingContactOpt = contactRepository.findByUserIdAndIsPrimary(client.getUserId(), true);
+                if (existingContactOpt.isPresent()) {
+                    // Atualiza o contato existente (sem alterar a senha)
+                    contact = existingContactOpt.get();
+                    contact.setFirstName(request.getFirstname());
+                    contact.setLastName(request.getLastname());
+                    contact.setEmail(request.getEmail());
+                    contact.setPhoneNumber(request.getPhonenumber());
+                    // NÃO altera a senha - mantém a senha existente
+                    
+                    // Salva as alterações do contato
+                    contact = contactRepository.save(contact);
+                } else {
+                    // Se não existe contato primário, cria um novo (caso raro)
+                    contact = new Contact();
+                    contact.setUserId(client.getUserId());
+                    contact.setFirstName(request.getFirstname());
+                    contact.setLastName(request.getLastname());
+                    contact.setEmail(request.getEmail());
+                    contact.setPhoneNumber(request.getPhonenumber());
+                    contact.setIsPrimary(true);
+                    contact.setPassword(passwordHash.hashPassword(request.getPassword())); // Senha padrão apenas se não existir contato
+                    
+                    // Salva o contato
+                    contact = contactRepository.save(contact);
+                }
+                
+            } else {
+                // Cliente não existe - cria um novo cliente
+                // Verifica se o email já existe
+                if (request.getEmail() != null && contactRepository.existsByEmail(request.getEmail())) {
+                    throw new Exception("Email já está em uso");
+                }
+                
+                // Cria o cliente
+                client = new Client();
+                client.setCompany(request.getCompany() != null ? request.getCompany() : 
+                    (request.getFirstname() != null && request.getLastname() != null ? 
+                        request.getFirstname() + " " + request.getLastname() : "Nova Empresa"));
+                client.setPhoneNumber(request.getPhonenumber());
+                client.setActive(true);
+                client.setDefaultClient(true);
 
-        // Salva o cliente
-        client = clientRepository.save(client);
+                // Salva o cliente
+                client = clientRepository.save(client);
+                
+                // Cria o contato
+                contact = new Contact();
+                contact.setUserId(client.getUserId());
+                contact.setFirstName(request.getFirstname());
+                contact.setLastName(request.getLastname());
+                contact.setEmail(request.getEmail());
+                contact.setPhoneNumber(request.getPhonenumber());
+                contact.setIsPrimary(true);
+                contact.setPassword(passwordHash.hashPassword(request.getPassword())); // Senha fornecida pelo usuário
+                
+                // Salva o contato
+                contact = contactRepository.save(contact);
+            }
+        } else {
+            // Lógica original para novo cliente
+            // Verifica se o email já existe
+            if (request.getEmail() != null && contactRepository.existsByEmail(request.getEmail())) {
+                throw new Exception("Email já está em uso");
+            }
+            
+            // Cria o cliente
+            client = new Client();
+            client.setCompany(request.getCompany());
+            client.setPhoneNumber(request.getPhonenumber());
+            client.setActive(true);
+            client.setDefaultClient(true);
+
+            // Salva o cliente
+            client = clientRepository.save(client);
+            
+            // Cria o contato
+            contact = new Contact();
+            contact.setUserId(client.getUserId());
+            contact.setFirstName(request.getFirstname());
+            contact.setLastName(request.getLastname());
+            contact.setEmail(request.getEmail());
+            contact.setPhoneNumber(request.getPhonenumber());
+            contact.setIsPrimary(true);
+            contact.setPassword(passwordHash.hashPassword(request.getPassword())); // Senha fornecida pelo usuário
+            
+            // Salva o contato
+            contact = contactRepository.save(contact);
+        }
         
-        // Cria o contato
-        Contact contact = new Contact();
-        contact.setUserId(client.getUserId());
-        contact.setFirstName(request.getFirstname());
-        contact.setLastName(request.getLastname());
-        contact.setEmail(request.getEmail());
-        contact.setPhoneNumber(request.getPhonenumber());
-        contact.setIsPrimary(true);
-        contact.setPassword(passwordHash.hashPassword("123456")); // Senha padrão
-        
-        // Salva o contato
-        contact = contactRepository.save(contact);
+        // Valida limite de sites por cliente
+        long currentSitesCount = siteRepository.countByClientId(client.getUserId().intValue());
+        if (currentSitesCount >= maxSitesPerClient) {
+            throw new Exception("Limite de sites excedido. Cada cliente pode criar no máximo " + maxSitesPerClient + " sites. Cliente atual possui " + currentSitesCount + " sites.");
+        }
         
         // Cria o site
         Site site = new Site();
@@ -277,6 +399,11 @@ public class AuthService {
         site.setDescricaoNegocio(request.getDescricaoNegocio());
         site.setPublicoAlvo(request.getPublicoAlvo());
         site.setBannerTexto(request.getBannerTexto());
+        
+        // Novos campos
+        site.setPreference(request.getPreference());
+        site.setDescriptionSite(request.getDescriptionSite());
+        site.setTypeSite(request.getTypeSite());
         
         site.setQuemSomos(request.getQuemSomos());
         site.setServicos(request.getServicos());
@@ -381,17 +508,25 @@ public class AuthService {
                 projectDescription.append("• Todas as imagens devem ser carregadas via URL absoluta gerada neste processo (sem referências locais).\n");
                 projectDescription.append("• Seguir boas práticas de UX/UI, acessibilidade e performance.\n\n");
         projectDescription.append("INFORMAÇÕES DO CLIENTE:\n");
-        projectDescription.append("• Empresa: ").append(request.getCompany()).append("\n");
+        projectDescription.append("• Empresa: ").append(client.getCompany()).append("\n");
         projectDescription.append("• Nome do Site: ").append(request.getNomeSite()).append("\n");
         projectDescription.append("• Domínio: ").append(request.getDominio()).append("\n");
-        projectDescription.append("• Email: ").append(request.getEmail()).append("\n");
-                projectDescription.append("• Telefone (contato principal): ").append(request.getPhonenumber()).append("\n\n");
+        projectDescription.append("• Email: ").append(contact.getEmail()).append("\n");
+                projectDescription.append("• Telefone (contato principal): ").append(contact.getPhoneNumber()).append("\n\n");
         
-        projectDescription.append("DESCRIÇÃO DO NEGÓCIO:\n");
-        projectDescription.append(request.getDescricaoNegocio()).append("\n\n");
-        
-        projectDescription.append("PÚBLICO ALVO:\n");
-        projectDescription.append(request.getPublicoAlvo()).append("\n\n");
+        // Define o contexto baseado no preference
+        if ("descricao".equals(request.getPreference())) {
+            // Quando preference == "descricao", usa o description_site como contexto
+            projectDescription.append("CONTEXTO DO SITE:\n");
+            projectDescription.append(request.getDescriptionSite()).append("\n\n");
+        } else {
+            // Mantém a lógica original
+            projectDescription.append("DESCRIÇÃO DO NEGÓCIO:\n");
+            projectDescription.append(request.getDescricaoNegocio()).append("\n\n");
+            
+            projectDescription.append("PÚBLICO ALVO:\n");
+            projectDescription.append(request.getPublicoAlvo()).append("\n\n");
+        }
         
         projectDescription.append("TIPO DO SITE:\n");
         projectDescription.append("• Tipo: ").append(request.getTipoSite()).append("\n\n");
@@ -584,15 +719,12 @@ public class AuthService {
         
         taskDescription.append("INSTRUÇÕES PARA O DESENVOLVEDOR:\n");
         taskDescription.append("1. Analise todas as informações fornecidas\n");
-        taskDescription.append("2. Crie uma pasta com o ID: ").append(client.getUserId()).append("\n");
-        taskDescription.append("3. Dentro da pasta, crie um arquivo index.php\n");
-        taskDescription.append("4. Escreva todo o site no arquivo index.php usando HTML, CSS e PHP\n");
-        taskDescription.append("5. Crie um design moderno e atrativo seguindo as cores especificadas\n");
-        taskDescription.append("6. Implemente todas as seções solicitadas no index.php\n");
-        taskDescription.append("7. Garanta que o site seja totalmente responsivo\n");
-        taskDescription.append("8. Teste em diferentes dispositivos e navegadores\n");
-        taskDescription.append("9. Otimize para performance e SEO\n");
-        taskDescription.append("10. Entre em contato com o cliente para feedback e ajustes\n");
+        taskDescription.append("2. Crie um design moderno e atrativo seguindo as cores especificadas\n");
+        taskDescription.append("3. Implemente todas as seções solicitadas\n");
+        taskDescription.append("4. Garanta que o site seja totalmente responsivo\n");
+        taskDescription.append("5. Teste em diferentes dispositivos e navegadores\n");
+        taskDescription.append("6. Otimize para performance e SEO\n");
+        taskDescription.append("7. Entre em contato com o cliente para feedback e ajustes\n");
         
         task.setDescription(taskDescription.toString());
         
@@ -699,38 +831,60 @@ public class AuthService {
         taskFatura.setDescription(taskFaturaDescription.toString());
         taskRepository.save(taskFatura);
         
-        // Envia mensagem para fila MQ com site_id e contexto (detalhado, texto plano)
-        StringBuilder ctx = new StringBuilder();
-        ctx.append("Site criado\n");
-        ctx.append("Empresa: ").append(request.getCompany()).append("\n");
-        ctx.append("Nome do site: ").append(request.getNomeSite()).append("\n");
-        ctx.append("Domínio: ").append(request.getDominio()).append("\n");
-        ctx.append("Tipo: ").append(request.getTipoSite()).append("\n");
-        if (request.getDescricaoNegocio() != null) ctx.append("Descrição do negócio: ").append(request.getDescricaoNegocio()).append("\n");
-        if (request.getPublicoAlvo() != null) ctx.append("Público-alvo: ").append(request.getPublicoAlvo()).append("\n");
-        if (request.getBannerTexto() != null) ctx.append("Banner (texto): ").append(request.getBannerTexto()).append("\n");
-        if (site.getBannerTextoImg() != null) ctx.append("Banner (imagem): ").append(site.getBannerTextoImg()).append("\n");
-        if (request.getQuemSomos() != null) ctx.append("Quem somos: ").append(request.getQuemSomos()).append("\n");
-        if (request.getServicos() != null) ctx.append("Serviços: ").append(request.getServicos()).append("\n");
-        if (site.getLogo() != null) ctx.append("Logo (URL): ").append(site.getLogo()).append("\n");
-        if (site.getFavicon() != null) ctx.append("Favicon (URL): ").append(site.getFavicon()).append("\n");
-        if (request.getCorPrincipal() != null) ctx.append("Cor principal: ").append(request.getCorPrincipal()).append("\n");
-        if (request.getCorSecundaria() != null) ctx.append("Cor secundária: ").append(request.getCorSecundaria()).append("\n");
-        if (request.getEstilo() != null) ctx.append("Estilo: ").append(request.getEstilo()).append("\n");
-        if (request.getEmailDesejado() != null) ctx.append("Email desejado: ").append(request.getEmailDesejado()).append("\n");
-        if (request.getEmailEmpresa() != null) ctx.append("Email empresa: ").append(request.getEmailEmpresa()).append("\n");
-        if (request.getTelefoneEmpresa() != null) ctx.append("Telefone: ").append(request.getTelefoneEmpresa()).append("\n");
-        if (request.getEnderecoEmpresa() != null) ctx.append("Endereço: ").append(request.getEnderecoEmpresa()).append("\n");
-        ctx.append("Logo (opção): ").append(request.getLogoOpcao()).append("\n");
-        ctx.append("Banner (opção): ").append(request.getBannerOpcao()).append("\n");
-        if (request.getBannerIaDescricao() != null) ctx.append("Banner IA (descrição): ").append(request.getBannerIaDescricao()).append("\n");
-        if (request.getBannerProfissionalDescricao() != null) ctx.append("Banner Profissional (descrição): ").append(request.getBannerProfissionalDescricao()).append("\n");
-        if (site.getEmpresaImagem() != null) ctx.append("Empresa imagem (URL): ").append(site.getEmpresaImagem()).append("\n");
-        if (site.getServicosImagens() != null) ctx.append("Serviços imagens (URLs): ").append(site.getServicosImagens()).append("\n");
-
-        queueService.sendSiteCreationMessage(site.getSiteId(), ctx.toString());
+        // Salva o contexto final no campo description_site do site (independente da jornada)
+        site.setDescriptionSite(projectDescription.toString());
+        siteRepository.save(site);
+        
+        // Envia mensagem para fila MQ com site_id e contexto exatamente igual ao da Task principal
+        queueService.sendSiteCreationMessage(site.getSiteId(), client.getUserId().intValue(), taskDescription.toString());
         
         return client;
+    }
+    
+    /**
+     * Busca informações básicas de um cliente por ID
+     * @param clientId ID do cliente
+     * @return Informações básicas do cliente (company, email, phoneNumber)
+     * @throws Exception Se o cliente não for encontrado
+     */
+    public ClientInfoResponse getClientInfo(Long clientId) throws Exception {
+        // Busca o cliente
+        Optional<Client> clientOpt = clientRepository.findById(clientId);
+        
+        if (clientOpt.isEmpty()) {
+            throw new Exception("Cliente não encontrado");
+        }
+        
+        Client client = clientOpt.get();
+        
+        // Busca o contato primário do cliente
+        Optional<Contact> contactOpt = contactRepository.findByUserIdAndIsPrimary(clientId, true);
+        
+        String email = null;
+        if (contactOpt.isPresent()) {
+            email = contactOpt.get().getEmail();
+        }
+        
+        return new ClientInfoResponse(
+            client.getCompany(),
+            email,
+            client.getPhoneNumber()
+        );
+    }
+    
+    /**
+     * Conta quantos sites um cliente possui
+     * @param clientId ID do cliente
+     * @return Número de sites do cliente
+     * @throws Exception Se o cliente não for encontrado
+     */
+    public long getClientSitesCount(Long clientId) throws Exception {
+        // Verifica se o cliente existe
+        if (!clientRepository.existsById(clientId)) {
+            throw new Exception("Cliente não encontrado");
+        }
+        
+        return siteRepository.countByClientId(clientId.intValue());
     }
 }
 

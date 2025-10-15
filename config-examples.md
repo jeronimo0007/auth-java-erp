@@ -70,18 +70,15 @@ export SERVER_PORT=3000
 
 ### Porta 8080 (padrão)
 ```bash
-curl http://localhost:8080/auth/test
 curl -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d '{"email":"teste@teste.com","password":"123456"}'
 ```
 
 ### Porta 3000
 ```bash
-curl http://localhost:3000/auth/test
 curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"email":"teste@teste.com","password":"123456"}'
 ```
 
 ### Porta 9000
 ```bash
-curl http://localhost:9000/auth/test
 curl -X POST http://localhost:9000/auth/login -H "Content-Type: application/json" -d '{"email":"teste@teste.com","password":"123456"}'
 ```

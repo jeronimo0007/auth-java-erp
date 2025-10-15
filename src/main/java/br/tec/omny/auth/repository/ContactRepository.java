@@ -30,5 +30,13 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
      */
     java.util.List<Contact> findByUserId(Long userId);
     
+    /**
+     * Busca contato primário por userId
+     * @param userId ID do usuário
+     * @param isPrimary Se é contato primário
+     * @return Optional com o contato primário encontrado
+     */
+    Optional<Contact> findByUserIdAndIsPrimary(Long userId, Boolean isPrimary);
+    
 }
 

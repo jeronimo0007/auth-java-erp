@@ -135,6 +135,15 @@ public class Site {
     @Column(name = "status", nullable = false)
     private Integer status = 0; // 0 = Pendente, 1 = Em desenvolvimento, 2 = Concluído, 3 = Cancelado
 
+    @Column(name = "preference", length = 50)
+    private String preference; // "descricao" ou outros valores
+
+    @Column(name = "description_site", columnDefinition = "TEXT")
+    private String descriptionSite;
+
+    @Column(name = "type_site", length = 50)
+    private String typeSite;
+
     @Column(name = "data_criacao", nullable = false)
     private LocalDateTime dataCriacao;
 
