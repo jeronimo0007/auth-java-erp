@@ -23,51 +23,65 @@ public class SiteController {
      */
     @PostMapping("/register/site")
     public ResponseEntity<ApiResponse> registerSite(
-            @RequestParam("email") String email,
-            @RequestParam("phonenumber") String phonenumber,
-            @RequestParam("company") String company,
-            @RequestParam("nome_site") String nomeSite,
-            @RequestParam("dominio") String dominio,
-            @RequestParam("descricao_negocio") String descricaoNegocio,
-            @RequestParam("publico_alvo") String publicoAlvo,
-            @RequestParam("banner_texto") String bannerTexto,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "phonenumber", required = false) String phonenumber,
+            @RequestParam(value = "company", required = false) String company,
+            @RequestParam(value = "nome_site", required = false) String nomeSite,
+            @RequestParam(value = "dominio", required = false) String dominio,
+            @RequestParam(value = "descricao_negocio", required = false) String descricaoNegocio,
+            @RequestParam(value = "publico_alvo", required = false) String publicoAlvo,
+            @RequestParam(value = "banner_texto", required = false) String bannerTexto,
             @RequestParam(value = "banner_texto_img", required = false) MultipartFile bannerTextoImg,
-            @RequestParam(value = "banner_secundario", required = false) String bannerSecundario,
-            @RequestParam(value = "banner_secundario_img", required = false) MultipartFile bannerSecundarioImg,
-            @RequestParam(value = "banner_terciario", required = false) String bannerTerciario,
-            @RequestParam(value = "banner_terciario_img", required = false) MultipartFile bannerTerciarioImg,
-            @RequestParam("tipo_site") String tipoSite,
-            @RequestParam("quem_somos") String quemSomos,
+            
+            @RequestParam(value = "tipo_site", required = false) String tipoSite,
+            @RequestParam(value = "quem_somos", required = false) String quemSomos,
             @RequestParam(value = "empresa_imagem", required = false) MultipartFile empresaImagem,
-            @RequestParam("servicos") String servicos,
+            @RequestParam(value = "servicos", required = false) String servicos,
             @RequestParam(value = "servicos_imagens[]", required = false) MultipartFile[] servicosImagens,
-            @RequestParam("logo_opcao") String logoOpcao,
-            @RequestParam("email_empresa") String emailEmpresa,
-            @RequestParam("telefone_empresa") String telefoneEmpresa,
-            @RequestParam("endereco_empresa") String enderecoEmpresa,
-            @RequestParam("secao1_titulo") String secao1Titulo,
-            @RequestParam("secao1_conteudo") String secao1Conteudo,
-            @RequestParam("secao2_titulo") String secao2Titulo,
-            @RequestParam("secao2_conteudo") String secao2Conteudo,
+            @RequestParam(value = "logo_opcao", required = false) String logoOpcao,
+            @RequestParam(value = "email_desejado", required = false) String emailDesejado,
+            @RequestParam(value = "banner_opcao", required = false) String bannerOpcao,
+            @RequestParam(value = "banner_ia_descricao", required = false) String bannerIaDescricao,
+            
+            @RequestParam(value = "banner_profissional_descricao", required = false) String bannerProfissionalDescricao,
+            @RequestParam(value = "email_empresa", required = false) String emailEmpresa,
+            @RequestParam(value = "telefone_empresa", required = false) String telefoneEmpresa,
+            @RequestParam(value = "endereco_empresa", required = false) String enderecoEmpresa,
+            @RequestParam(value = "secao1_titulo", required = false) String secao1Titulo,
+            @RequestParam(value = "secao1_conteudo", required = false) String secao1Conteudo,
+            @RequestParam(value = "secao2_titulo", required = false) String secao2Titulo,
+            @RequestParam(value = "secao2_conteudo", required = false) String secao2Conteudo,
             @RequestParam(value = "logo", required = false) MultipartFile logo,
             @RequestParam(value = "favicon", required = false) MultipartFile favicon,
-            @RequestParam("cor_principal") String corPrincipal,
-            @RequestParam("cor_secundaria") String corSecundaria,
-            @RequestParam("estilo") String estilo,
+            @RequestParam(value = "cor_principal", required = false) String corPrincipal,
+            @RequestParam(value = "cor_secundaria", required = false) String corSecundaria,
+            @RequestParam(value = "estilo", required = false) String estilo,
             @RequestParam(value = "observacoes", required = false) String observacoes,
-            @RequestParam("firstname") String firstname,
-            @RequestParam("lastname") String lastname,
+            @RequestParam(value = "firstname", required = false) String firstname,
+            @RequestParam(value = "lastname", required = false) String lastname,
+            @RequestParam(value = "firstName", required = false) String firstName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+            @RequestParam(value = "password", required = false) String password,
             @RequestParam(value = "facebook", required = false) String facebook,
             @RequestParam(value = "linkedin", required = false) String linkedin,
             @RequestParam(value = "youtube", required = false) String youtube,
             @RequestParam(value = "tiktok", required = false) String tiktok,
-            @RequestParam(value = "instagram", required = false) String instagram) {
+            @RequestParam(value = "instagram", required = false) String instagram,
+            
+            // Novos campos
+            @RequestParam(value = "preference", required = false) String preference,
+            @RequestParam(value = "description_site", required = false) String descriptionSite,
+            @RequestParam(value = "type_site", required = false) String typeSite,
+            @RequestParam(value = "user_id", required = false) String userIdStr,
+            @RequestParam(value = "recaptchaToken", required = false) String recaptchaToken) {
         
         try {
             // Cria o objeto de request
             SiteRegisterRequest request = new SiteRegisterRequest();
             request.setEmail(email);
-            request.setPhonenumber(phonenumber);
+            // Usa phoneNumber se disponível, senão usa phonenumber
+            request.setPhonenumber(phoneNumber != null ? phoneNumber : phonenumber);
             request.setCompany(company);
             request.setNomeSite(nomeSite);
             request.setDominio(dominio);
@@ -75,10 +89,7 @@ public class SiteController {
             request.setPublicoAlvo(publicoAlvo);
             request.setBannerTexto(bannerTexto);
             request.setBannerTextoImg(bannerTextoImg);
-            request.setBannerSecundario(bannerSecundario);
-            request.setBannerSecundarioImg(bannerSecundarioImg);
-            request.setBannerTerciario(bannerTerciario);
-            request.setBannerTerciarioImg(bannerTerciarioImg);
+            
             request.setTipoSite(tipoSite);
             request.setQuemSomos(quemSomos);
             request.setEmpresaImagem(empresaImagem);
@@ -87,6 +98,12 @@ public class SiteController {
                 request.setServicosImagens(java.util.Arrays.asList(servicosImagens));
             }
             request.setLogoOpcao(logoOpcao);
+            request.setEmailDesejado(emailDesejado);
+            request.setBannerOpcao(bannerOpcao);
+            
+            request.setBannerIaDescricao(bannerIaDescricao);
+            
+            request.setBannerProfissionalDescricao(bannerProfissionalDescricao);
             request.setEmailEmpresa(emailEmpresa);
             request.setTelefoneEmpresa(telefoneEmpresa);
             request.setEnderecoEmpresa(enderecoEmpresa);
@@ -100,13 +117,33 @@ public class SiteController {
             request.setCorSecundaria(corSecundaria);
             request.setEstilo(estilo);
             request.setObservacoes(observacoes);
-            request.setFirstname(firstname);
-            request.setLastname(lastname);
+            // Usa firstName/LastName se disponível, senão usa firstname/lastname
+            request.setFirstname(firstName != null ? firstName : firstname);
+            request.setLastname(lastName != null ? lastName : lastname);
             request.setFacebook(facebook);
             request.setLinkedin(linkedin);
             request.setYoutube(youtube);
             request.setTiktok(tiktok);
             request.setInstagram(instagram);
+            
+            // Novos campos
+            request.setPreference(preference);
+            request.setDescriptionSite(descriptionSite);
+            request.setTypeSite(typeSite);
+            
+            // Conversão segura do user_id
+            Long userId = null;
+            if (userIdStr != null && !userIdStr.trim().isEmpty()) {
+                try {
+                    userId = Long.parseLong(userIdStr.trim());
+                } catch (NumberFormatException e) {
+                    // Se não conseguir converter, define como null (será tratado como novo cliente)
+                    userId = null;
+                }
+            }
+            request.setUserId(userId);
+            request.setPassword(password);
+            request.setRecaptchaToken(recaptchaToken);
             
             Client client = authService.registerSite(request);
             

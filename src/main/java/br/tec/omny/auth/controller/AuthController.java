@@ -3,6 +3,7 @@ package br.tec.omny.auth.controller;
 import br.tec.omny.auth.dto.AdminLoginRequest;
 import br.tec.omny.auth.dto.AdminLoginResponse;
 import br.tec.omny.auth.dto.ApiResponse;
+import br.tec.omny.auth.dto.ClientInfoResponse;
 import br.tec.omny.auth.dto.LoginRequest;
 import br.tec.omny.auth.dto.LostPasswordRequest;
 import br.tec.omny.auth.dto.RegisterRequest;
@@ -23,42 +24,6 @@ public class AuthController {
     private AuthService authService;
     
     /**
-     * Endpoint de teste
-     * GET /auth/test
-     */
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("Auth endpoint funcionando!");
-    }
-    
-    /**
-     * Endpoint de teste POST
-     * POST /auth/test-post
-     */
-    @PostMapping("/test-post")
-    public ResponseEntity<String> testPost() {
-        return ResponseEntity.ok("Auth POST endpoint funcionando!");
-    }
-    
-    /**
-     * Endpoint de teste POST com JSON
-     * POST /auth/test-json
-     */
-    @PostMapping(value = "/test-json", consumes = "application/json")
-    public ResponseEntity<String> testJson(@RequestBody String body) {
-        return ResponseEntity.ok("Auth JSON endpoint funcionando! Body: " + body);
-    }
-    
-    /**
-     * Endpoint de teste de login
-     * POST /auth/test-login
-     */
-    @PostMapping(value = "/test-login", consumes = "application/json")
-    public ResponseEntity<String> testLogin(@RequestBody String body) {
-        return ResponseEntity.ok("Auth login endpoint funcionando! Body: " + body);
-    }
-    
-    /**
      * Endpoint para registro de usuário
      * POST /api/auth/register
      */
@@ -71,7 +36,19 @@ public class AuthController {
             client.setActive(null);
             client.setDefaultClient(null);
             
-            return ResponseEntity.ok(ApiResponse.success("Usuário registrado com sucesso", client));
+            // Cria um objeto de resposta com o email incluído
+            java.util.Map<String, Object> responseData = new java.util.HashMap<>();
+            responseData.put("userId", client.getUserId());
+            responseData.put("company", client.getCompany());
+            responseData.put("phoneNumber", client.getPhoneNumber());
+            responseData.put("email", request.getEmail());
+            responseData.put("zip", request.getZip());
+            responseData.put("city", client.getCity());
+            responseData.put("state", request.getState());
+            responseData.put("address", client.getAddress());
+            responseData.put("dateCreated", client.getDateCreated());
+            
+            return ResponseEntity.ok(ApiResponse.success("Usuário registrado com sucesso", responseData));
             
         } catch (Exception e) {
             return ResponseEntity.badRequest()
@@ -140,6 +117,41 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(AdminLoginResponse.error("Erro interno do servidor: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Endpoint para buscar informações básicas de um cliente
+     * GET /auth/client/{id}
+     */
+    @GetMapping("/client/{id}")
+    public ResponseEntity<ApiResponse> getClientInfo(@PathVariable Long id) {
+        try {
+            ClientInfoResponse clientInfo = authService.getClientInfo(id);
+            
+            return ResponseEntity.ok(ApiResponse.success("Informações do cliente encontradas", clientInfo));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+    
+    /**
+     * Endpoint para contar quantos sites um cliente possui
+     * GET /auth/client/{id}/sites/count
+     */
+    @GetMapping("/client/{id}/sites/count")
+    public ResponseEntity<ApiResponse> getClientSitesCount(@PathVariable Long id) {
+        try {
+            long sitesCount = authService.getClientSitesCount(id);
+            
+            return ResponseEntity.ok(ApiResponse.success("Contagem de sites obtida com sucesso", 
+                java.util.Map.of("clientId", id, "sitesCount", sitesCount)));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(e.getMessage()));
         }
     }
     

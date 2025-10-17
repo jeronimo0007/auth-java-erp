@@ -20,8 +20,7 @@ services:
       - RABBITMQ_HOST=${RABBITMQ_HOST}
       - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-    volumes:
-      - /var/app/uploads:/app/uploads
+    # Nenhum volume local de uploads: todos os arquivos vão para S3/Spaces
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
