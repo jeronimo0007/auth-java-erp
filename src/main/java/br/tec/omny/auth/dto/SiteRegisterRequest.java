@@ -112,6 +112,9 @@ public class SiteRegisterRequest {
     
     private String password; // Senha do usuário
     
+    // reCAPTCHA
+    private String recaptchaToken;
+    
     // Construtores
     public SiteRegisterRequest() {}
     
@@ -475,5 +478,14 @@ public class SiteRegisterRequest {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+    
+    // reCAPTCHA
+    public String getRecaptchaToken() {
+        return recaptchaToken;
+    }
+    
+    public void setRecaptchaToken(String recaptchaToken) {
+        this.recaptchaToken = recaptchaToken;
     }
 }

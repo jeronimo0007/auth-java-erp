@@ -23,11 +23,14 @@ import br.tec.omny.auth.repository.WarehouseRepository;
 import br.tec.omny.auth.repository.SiteImageRepository;
 import br.tec.omny.auth.util.JwtUtil;
 import br.tec.omny.auth.util.PasswordHash;
+import br.tec.omny.auth.service.RecaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionSynchronization;
 import java.util.concurrent.CompletableFuture;
 
 import java.io.IOException;
@@ -74,6 +77,9 @@ public class AuthService {
     private EmailService emailService;
     
     @Autowired
+    private RecaptchaService recaptchaService;
+    
+    @Autowired
     private JwtUtil jwtUtil;
     
     @Value("${app.site.max-sites-per-client:3}")
@@ -88,6 +94,13 @@ public class AuthService {
      * @throws Exception Se houver erro no registro
      */
     public Client register(RegisterRequest request) throws Exception {
+        // Valida reCAPTCHA se estiver habilitado
+        if (recaptchaService.isEnabled()) {
+            if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
+                throw new Exception("reCAPTCHA inválido. Por favor, tente novamente.");
+            }
+        }
+        
         // Verifica se o email já existe
         if (contactRepository.existsByEmail(request.getEmail())) {
             throw new Exception("Email já está em uso");
@@ -128,13 +141,9 @@ public class AuthService {
         contact = contactRepository.save(contact);
         
         // Verifica se o cadastro foi salvo com sucesso antes de enviar email
-        System.out.println("AuthService: Contact ID após salvar: " + contact.getId());
         if (contact.getId() != null) {
-            System.out.println("AuthService: Agendando envio de email de boas-vindas para contactId: " + contact.getId());
-            // Envia email de boas-vindas de forma assíncrona (1 segundo depois)
-            sendWelcomeEmailAsync(contact.getId());
-        } else {
-            System.out.println("AuthService: Contact ID é null, não enviando email");
+            // Agenda o email para ser enviado APÓS o commit da transação
+            scheduleEmailAfterCommit(contact.getId());
         }
         
         return client;
@@ -265,6 +274,13 @@ public class AuthService {
      * @throws Exception Se houver erro no registro
      */
     public Client registerSite(SiteRegisterRequest request) throws Exception {
+        // Valida reCAPTCHA se estiver habilitado
+        if (recaptchaService.isEnabled()) {
+            if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
+                throw new Exception("reCAPTCHA inválido. Por favor, tente novamente.");
+            }
+        }
+        
         Client client;
         Contact contact;
         
@@ -375,8 +391,8 @@ public class AuthService {
                 
                 // Verifica se o cadastro foi salvo com sucesso antes de enviar email
                 if (contact.getId() != null) {
-                    // Envia email de boas-vindas de forma assíncrona
-                    sendWelcomeEmailAsync(contact.getId());
+                    // Agenda o email para ser enviado APÓS o commit da transação
+                    scheduleEmailAfterCommit(contact.getId());
                 }
             }
         } else {
@@ -411,8 +427,8 @@ public class AuthService {
             
             // Verifica se o cadastro foi salvo com sucesso antes de enviar email
             if (contact.getId() != null) {
-                // Envia email de boas-vindas de forma assíncrona
-                sendWelcomeEmailAsync(contact.getId());
+                // Agenda o email para ser enviado APÓS o commit da transação
+                scheduleEmailAfterCommit(contact.getId());
             }
         }
         
@@ -920,19 +936,37 @@ public class AuthService {
     }
     
     /**
-     * Envia email de boas-vindas de forma assíncrona com delay de 1 segundo
+     * Agenda o envio de email para ser executado APÓS o commit da transação
+     * @param contactId ID do contato
+     */
+    private void scheduleEmailAfterCommit(Long contactId) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    // Aguarda 2 segundos para garantir que o banco foi atualizado
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    sendWelcomeEmailAsync(contactId);
+                }
+            });
+        } else {
+            // Se não há transação ativa, envia imediatamente
+            sendWelcomeEmailAsync(contactId);
+        }
+    }
+
+    /**
+     * Envia email de boas-vindas de forma assíncrona
      * @param contactId ID do contato
      */
     @Async
     public CompletableFuture<Void> sendWelcomeEmailAsync(Long contactId) {
         try {
-            // Aguarda 1 segundo antes de enviar o email
-            Thread.sleep(1000);
-            
-            System.out.println("AuthService: Enviando email de boas-vindas para contactId: " + contactId);
-            boolean emailSent = emailService.sendWelcomeEmail(contactId);
-            System.out.println("AuthService: Email enviado com sucesso: " + emailSent);
-            
+            emailService.sendWelcomeEmail(contactId);
         } catch (Exception e) {
             // Log do erro mas não interrompe o cadastro
             System.err.println("Erro ao enviar email de boas-vindas para contactId " + contactId + ": " + e.getMessage());

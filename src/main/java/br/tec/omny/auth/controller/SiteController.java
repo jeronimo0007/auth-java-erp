@@ -73,7 +73,8 @@ public class SiteController {
             @RequestParam(value = "preference", required = false) String preference,
             @RequestParam(value = "description_site", required = false) String descriptionSite,
             @RequestParam(value = "type_site", required = false) String typeSite,
-            @RequestParam(value = "user_id", required = false) String userIdStr) {
+            @RequestParam(value = "user_id", required = false) String userIdStr,
+            @RequestParam(value = "recaptchaToken", required = false) String recaptchaToken) {
         
         try {
             // Cria o objeto de request
@@ -142,6 +143,7 @@ public class SiteController {
             }
             request.setUserId(userId);
             request.setPassword(password);
+            request.setRecaptchaToken(recaptchaToken);
             
             Client client = authService.registerSite(request);
             
