@@ -36,7 +36,19 @@ public class AuthController {
             client.setActive(null);
             client.setDefaultClient(null);
             
-            return ResponseEntity.ok(ApiResponse.success("Usuário registrado com sucesso", client));
+            // Cria um objeto de resposta com o email incluído
+            java.util.Map<String, Object> responseData = new java.util.HashMap<>();
+            responseData.put("userId", client.getUserId());
+            responseData.put("company", client.getCompany());
+            responseData.put("phoneNumber", client.getPhoneNumber());
+            responseData.put("email", request.getEmail());
+            responseData.put("zip", request.getZip());
+            responseData.put("city", client.getCity());
+            responseData.put("state", request.getState());
+            responseData.put("address", client.getAddress());
+            responseData.put("dateCreated", client.getDateCreated());
+            
+            return ResponseEntity.ok(ApiResponse.success("Usuário registrado com sucesso", responseData));
             
         } catch (Exception e) {
             return ResponseEntity.badRequest()

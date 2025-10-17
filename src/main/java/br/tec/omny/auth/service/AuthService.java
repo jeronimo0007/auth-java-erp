@@ -25,8 +25,10 @@ import br.tec.omny.auth.util.JwtUtil;
 import br.tec.omny.auth.util.PasswordHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.concurrent.CompletableFuture;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -69,6 +71,9 @@ public class AuthService {
     private QueueService queueService;
     
     @Autowired
+    private EmailService emailService;
+    
+    @Autowired
     private JwtUtil jwtUtil;
     
     @Value("${app.site.max-sites-per-client:3}")
@@ -101,6 +106,11 @@ public class AuthService {
         // Salva o cliente
         client = clientRepository.save(client);
         
+        // Valida se a senha foi fornecida
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new Exception("Senha é obrigatória");
+        }
+        
         // Cria o contato
         Contact contact = new Contact(
             client.getUserId(),
@@ -115,7 +125,17 @@ public class AuthService {
         contact.setIsPrimary(true);
         
         // Salva o contato
-        contactRepository.save(contact);
+        contact = contactRepository.save(contact);
+        
+        // Verifica se o cadastro foi salvo com sucesso antes de enviar email
+        System.out.println("AuthService: Contact ID após salvar: " + contact.getId());
+        if (contact.getId() != null) {
+            System.out.println("AuthService: Agendando envio de email de boas-vindas para contactId: " + contact.getId());
+            // Envia email de boas-vindas de forma assíncrona (1 segundo depois)
+            sendWelcomeEmailAsync(contact.getId());
+        } else {
+            System.out.println("AuthService: Contact ID é null, não enviando email");
+        }
         
         return client;
     }
@@ -352,6 +372,12 @@ public class AuthService {
                 
                 // Salva o contato
                 contact = contactRepository.save(contact);
+                
+                // Verifica se o cadastro foi salvo com sucesso antes de enviar email
+                if (contact.getId() != null) {
+                    // Envia email de boas-vindas de forma assíncrona
+                    sendWelcomeEmailAsync(contact.getId());
+                }
             }
         } else {
             // Lógica original para novo cliente
@@ -382,6 +408,12 @@ public class AuthService {
             
             // Salva o contato
             contact = contactRepository.save(contact);
+            
+            // Verifica se o cadastro foi salvo com sucesso antes de enviar email
+            if (contact.getId() != null) {
+                // Envia email de boas-vindas de forma assíncrona
+                sendWelcomeEmailAsync(contact.getId());
+            }
         }
         
         // Valida limite de sites por cliente
@@ -835,8 +867,8 @@ public class AuthService {
         site.setDescriptionSite(projectDescription.toString());
         siteRepository.save(site);
         
-        // Envia mensagem para fila MQ com site_id e contexto exatamente igual ao da Task principal
-        queueService.sendSiteCreationMessage(site.getSiteId(), client.getUserId().intValue(), taskDescription.toString());
+        // Envia mensagem para fila MQ com site_id, client_id, contact_id e contexto exatamente igual ao da Task principal
+        queueService.sendSiteCreationMessage(site.getSiteId(), client.getUserId().intValue(), contact.getId(), taskDescription.toString());
         
         return client;
     }
@@ -885,6 +917,28 @@ public class AuthService {
         }
         
         return siteRepository.countByClientId(clientId.intValue());
+    }
+    
+    /**
+     * Envia email de boas-vindas de forma assíncrona com delay de 1 segundo
+     * @param contactId ID do contato
+     */
+    @Async
+    public CompletableFuture<Void> sendWelcomeEmailAsync(Long contactId) {
+        try {
+            // Aguarda 1 segundo antes de enviar o email
+            Thread.sleep(1000);
+            
+            System.out.println("AuthService: Enviando email de boas-vindas para contactId: " + contactId);
+            boolean emailSent = emailService.sendWelcomeEmail(contactId);
+            System.out.println("AuthService: Email enviado com sucesso: " + emailSent);
+            
+        } catch (Exception e) {
+            // Log do erro mas não interrompe o cadastro
+            System.err.println("Erro ao enviar email de boas-vindas para contactId " + contactId + ": " + e.getMessage());
+        }
+        
+        return CompletableFuture.completedFuture(null);
     }
 }
 
