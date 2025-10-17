@@ -246,7 +246,37 @@ spring.datasource.password=
 - `"Login Inválido"` - Senha incorreta
 - `"Usuário inativo, contate o administrador"` - Usuário desativado
 
-### 5. Registro de Site
+### 6. Buscar Informações do Cliente
+**GET** `/auth/client/{id}`
+
+**Parâmetros:**
+- `id` (Long) - ID do cliente
+
+**Resposta de Sucesso:**
+```json
+{
+  "success": true,
+  "message": "Informações do cliente encontradas",
+  "data": {
+    "company": "Nome da Empresa",
+    "email": "cliente@email.com",
+    "phoneNumber": "11999999999"
+  }
+}
+```
+
+**Resposta de Erro:**
+```json
+{
+  "success": false,
+  "message": "Cliente não encontrado"
+}
+```
+
+**Descrição:**
+Este endpoint retorna apenas as informações básicas de um cliente específico: nome da empresa, email do contato primário e telefone. Útil para consultas rápidas sem expor dados sensíveis.
+
+### 7. Registro de Site
 
 **Endpoint:** `POST /register/site`
 

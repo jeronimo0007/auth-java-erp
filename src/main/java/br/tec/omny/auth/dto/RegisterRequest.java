@@ -6,9 +6,12 @@ import jakarta.validation.constraints.Size;
 
 public class RegisterRequest {
     
-    @NotBlank(message = "Nome da empresa é obrigatório")
-    private String company;
+    // Primeira linha: Nome e Telefone
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
     
+    // Segunda linha: Email e Senha
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email deve ter um formato válido")
     private String email;
@@ -17,9 +20,9 @@ public class RegisterRequest {
     @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     private String password;
     
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
+    // Outros campos
+    @NotBlank(message = "Nome da empresa é obrigatório")
+    private String company;
     private String zip;
     private String city;
     private String state;
@@ -28,14 +31,14 @@ public class RegisterRequest {
     // Construtores
     public RegisterRequest() {}
     
-    public RegisterRequest(String company, String email, String password, String firstName, String lastName, 
-                          String phoneNumber, String zip, String city, String state, String address) {
-        this.company = company;
-        this.email = email;
-        this.password = password;
+    public RegisterRequest(String firstName, String lastName, String phoneNumber, String email, String password, 
+                          String company, String zip, String city, String state, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.password = password;
+        this.company = company;
         this.zip = zip;
         this.city = city;
         this.state = state;
@@ -43,30 +46,7 @@ public class RegisterRequest {
     }
     
     // Getters e Setters
-    public String getCompany() {
-        return company;
-    }
-    
-    public void setCompany(String company) {
-        this.company = company;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
+    // Primeira linha: Nome e Telefone
     public String getFirstName() {
         return firstName;
     }
@@ -89,6 +69,32 @@ public class RegisterRequest {
     
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+    
+    // Segunda linha: Email e Senha
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    // Outros campos
+    public String getCompany() {
+        return company;
+    }
+    
+    public void setCompany(String company) {
+        this.company = company;
     }
     
     public String getZip() {

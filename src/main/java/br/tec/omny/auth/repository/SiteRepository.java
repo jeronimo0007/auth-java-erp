@@ -19,4 +19,11 @@ public interface SiteRepository extends JpaRepository<Site, Integer> {
     List<Site> findByTipoSite(String tipoSite);
 
     Optional<Site> findByDominio(String dominio);
+    
+    /**
+     * Conta quantos sites um cliente possui
+     * @param clientId ID do cliente
+     * @return Número de sites do cliente
+     */
+    long countByClientId(Integer clientId);
 }

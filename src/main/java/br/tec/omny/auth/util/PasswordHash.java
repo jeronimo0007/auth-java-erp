@@ -85,6 +85,8 @@ public class PasswordHash {
      */
     private String gensaltPrivate(byte[] input) {
         StringBuilder output = new StringBuilder("$P$");
+        // PHP usa +5 quando PHP_VERSION >= '5', senão usa +3
+        // Como estamos em Java (equivalente a PHP 5+), sempre usamos +5
         output.append(itoa64.charAt(Math.min(iterationCountLog2 + 5, 30)));
         output.append(encode64(input, 6));
         return output.toString();
@@ -122,11 +124,17 @@ public class PasswordHash {
         
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
+            // PHP: $hash = md5($salt . $password, true);
             byte[] hash = md.digest((salt + password).getBytes());
             
+            // PHP: do { $hash = md5($hash . $password, true); } while (--$count);
             for (int i = 0; i < count; i++) {
                 md.reset();
-                hash = md.digest(hash);
+                // Concatena hash + password (não apenas hash)
+                byte[] combined = new byte[hash.length + password.getBytes().length];
+                System.arraycopy(hash, 0, combined, 0, hash.length);
+                System.arraycopy(password.getBytes(), 0, combined, hash.length, password.getBytes().length);
+                hash = md.digest(combined);
             }
             
             output = setting.substring(0, 12);
@@ -329,7 +337,7 @@ public class PasswordHash {
      * @param args Argumentos da linha de comando
      */
     public static void main(String[] args) {
-        PasswordHash ph = new PasswordHash(8, true);
+        PasswordHash ph = new PasswordHash(8, false);
         
         // Teste com senha simples
         String password = "teste123";
