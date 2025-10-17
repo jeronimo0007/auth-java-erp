@@ -28,6 +28,9 @@ public class RegisterRequest {
     private String state;
     private String address;
     
+    // reCAPTCHA
+    private String recaptchaToken;
+    
     // Construtores
     public RegisterRequest() {}
     
@@ -127,6 +130,15 @@ public class RegisterRequest {
     
     public void setAddress(String address) {
         this.address = address;
+    }
+    
+    // reCAPTCHA
+    public String getRecaptchaToken() {
+        return recaptchaToken;
+    }
+    
+    public void setRecaptchaToken(String recaptchaToken) {
+        this.recaptchaToken = recaptchaToken;
     }
 }
 
