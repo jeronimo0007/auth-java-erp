@@ -274,8 +274,8 @@ public class AuthService {
      * @throws Exception Se houver erro no registro
      */
     public Client registerSite(SiteRegisterRequest request) throws Exception {
-        // Valida reCAPTCHA se estiver habilitado
-        if (recaptchaService.isEnabled()) {
+        // Valida reCAPTCHA apenas se for cadastro novo (sem user_id) e se estiver habilitado
+        if (recaptchaService.isEnabled() && request.getUserId() == null) {
             if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
                 throw new Exception("reCAPTCHA inválido. Por favor, tente novamente.");
             }
