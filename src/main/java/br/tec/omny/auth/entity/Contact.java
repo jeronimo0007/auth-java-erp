@@ -36,9 +36,22 @@ public class Contact {
     @Column(name = "datecreated")
     private LocalDateTime dateCreated;
     
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+    
+    @Column(name = "email_verification_key")
+    private String emailVerificationKey;
+    
+    @Column(name = "email_verification_sent_at")
+    private LocalDateTime emailVerificationSentAt;
+    
     @PrePersist
     protected void onCreate() {
         dateCreated = LocalDateTime.now();
+        // Configura campos de verificação de email para novos cadastros
+        emailVerifiedAt = LocalDateTime.now(); // Email já verificado no cadastro
+        emailVerificationKey = null; // Sem chave de verificação
+        emailVerificationSentAt = null; // Não foi enviado email de verificação
     }
     
     // Construtores
@@ -124,6 +137,30 @@ public class Contact {
     
     public void setDateCreated(LocalDateTime dateCreated) {
         this.dateCreated = dateCreated;
+    }
+    
+    public LocalDateTime getEmailVerifiedAt() {
+        return emailVerifiedAt;
+    }
+    
+    public void setEmailVerifiedAt(LocalDateTime emailVerifiedAt) {
+        this.emailVerifiedAt = emailVerifiedAt;
+    }
+    
+    public String getEmailVerificationKey() {
+        return emailVerificationKey;
+    }
+    
+    public void setEmailVerificationKey(String emailVerificationKey) {
+        this.emailVerificationKey = emailVerificationKey;
+    }
+    
+    public LocalDateTime getEmailVerificationSentAt() {
+        return emailVerificationSentAt;
+    }
+    
+    public void setEmailVerificationSentAt(LocalDateTime emailVerificationSentAt) {
+        this.emailVerificationSentAt = emailVerificationSentAt;
     }
 }
 
