@@ -1,6 +1,5 @@
 package br.tec.omny.auth.service;
 
-import br.tec.omny.auth.dto.SiteCreationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,8 +27,15 @@ public class QueueService {
      * @param clientId ID do cliente
      * @param contactId ID do contato
      * @param contexto Contexto/descrição do site (texto plano)
+     * @param ia Flag que indica se deve enviar para a fila RabbitMQ (true) ou não (false)
      */
-    public void sendSiteCreationMessage(Integer siteId, Integer clientId, Long contactId, String contexto) {
+    public void sendSiteCreationMessage(Integer siteId, Integer clientId, Long contactId, String contexto, Boolean ia) {
+        // Se ia for false, não envia para a fila
+        if (ia == null || !ia) {
+            logger.info("Envio para fila RabbitMQ desabilitado (ia=false) - Site ID: {}", siteId);
+            return;
+        }
+        
         try {
             // Envia como String (texto plano) para facilitar consumo
             String payload = contexto; // apenas o contexto no corpo
