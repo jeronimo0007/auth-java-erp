@@ -74,7 +74,8 @@ public class SiteController {
             @RequestParam(value = "description_site", required = false) String descriptionSite,
             @RequestParam(value = "type_site", required = false) String typeSite,
             @RequestParam(value = "user_id", required = false) String userIdStr,
-            @RequestParam(value = "recaptchaToken", required = false) String recaptchaToken) {
+            @RequestParam(value = "recaptchaToken", required = false) String recaptchaToken,
+            @RequestParam(value = "ia", required = false) Boolean ia) {
         
         try {
             // Cria o objeto de request
@@ -82,8 +83,19 @@ public class SiteController {
             request.setEmail(email);
             // Usa phoneNumber se disponível, senão usa phonenumber
             request.setPhonenumber(phoneNumber != null ? phoneNumber : phonenumber);
-            request.setCompany(company);
-            request.setNomeSite(nomeSite);
+
+            if(company == null){
+                request.setCompany(firstName+" "+lastName);
+            }else {
+                request.setCompany(company);
+            }
+
+            if(nomeSite == null){
+                request.setNomeSite(firstName+" "+lastName);
+            }else {
+                request.setNomeSite(nomeSite);
+            }
+
             request.setDominio(dominio);
             request.setDescricaoNegocio(descricaoNegocio);
             request.setPublicoAlvo(publicoAlvo);
@@ -144,6 +156,7 @@ public class SiteController {
             request.setUserId(userId);
             request.setPassword(password);
             request.setRecaptchaToken(recaptchaToken);
+            request.setIa(ia);
             
             Client client = authService.registerSite(request);
             

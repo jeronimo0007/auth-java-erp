@@ -884,10 +884,16 @@ public class AuthService {
         siteRepository.save(site);
         
         // Envia mensagem para fila MQ com site_id, client_id, contact_id e contexto exatamente igual ao da Task principal
-        queueService.sendSiteCreationMessage(site.getSiteId(), client.getUserId().intValue(), contact.getId(), taskDescription.toString());
+        Integer clientIdInteger = null;
+        if (client.getUserId() != null) {
+            clientIdInteger = Integer.valueOf(client.getUserId().intValue());
+        }
+        queueService.sendSiteCreationMessage(site.getSiteId(), clientIdInteger, contact.getId(), taskDescription.toString(), request.getIa());
         
         return client;
     }
+
+    
     
     /**
      * Busca informações básicas de um cliente por ID
