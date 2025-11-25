@@ -115,6 +115,9 @@ public class SiteRegisterRequest {
     // reCAPTCHA
     private String recaptchaToken;
     
+    // Flag para controlar envio para fila RabbitMQ
+    private Boolean ia;
+    
     // Construtores
     public SiteRegisterRequest() {}
     
@@ -488,4 +491,13 @@ public class SiteRegisterRequest {
     public void setRecaptchaToken(String recaptchaToken) {
         this.recaptchaToken = recaptchaToken;
     }
+    
+    public Boolean getIa() {
+        return ia;
+    }
+    
+    public void setIa(Boolean ia) {
+        this.ia = ia;
+    }
+    
 }
