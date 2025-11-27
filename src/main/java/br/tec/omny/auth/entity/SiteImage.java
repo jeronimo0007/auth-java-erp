@@ -21,6 +21,9 @@ public class SiteImage {
     @Column(name = "filename", length = 255)
     private String filename;
 
+    @Column(name = "name_imagem", length = 255)
+    private String nameImagem;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -68,6 +71,14 @@ public class SiteImage {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getNameImagem() {
+        return nameImagem;
+    }
+
+    public void setNameImagem(String nameImagem) {
+        this.nameImagem = nameImagem;
     }
 
     public LocalDateTime getCreatedAt() {

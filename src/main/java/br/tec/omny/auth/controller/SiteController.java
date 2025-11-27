@@ -111,13 +111,25 @@ public class SiteController {
             @PathVariable Integer siteId,
             MultipartHttpServletRequest request) {
         try {
-            List<MultipartFile> files = new ArrayList<>();
+            List<SiteImageService.SiteImageUpload> uploads = new ArrayList<>();
             Iterator<String> fileNames = request.getFileNames();
             while (fileNames.hasNext()) {
                 String fieldName = fileNames.next();
-                files.addAll(request.getFiles(fieldName));
+                List<MultipartFile> fieldFiles = request.getFiles(fieldName);
+                if (fieldFiles == null || fieldFiles.isEmpty()) {
+                    continue;
+                }
+                int size = fieldFiles.size();
+                for (int index = 0; index < size; index++) {
+                    MultipartFile file = fieldFiles.get(index);
+                    if (file == null || file.isEmpty()) {
+                        continue;
+                    }
+                    String imageName = size > 1 ? fieldName + "_" + (index + 1) : fieldName;
+                    uploads.add(new SiteImageService.SiteImageUpload(file, imageName));
+                }
             }
-            List<SiteImage> saved = siteImageService.uploadSiteImages(siteId, files);
+            List<SiteImage> saved = siteImageService.uploadSiteImages(siteId, uploads);
             return ResponseEntity.ok(ApiResponse.success("Imagens salvas com sucesso", saved));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Erro ao salvar imagens: " + e.getMessage()));

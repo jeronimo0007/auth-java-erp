@@ -19,12 +19,15 @@ public class SiteImageService {
     @Autowired
     private SiteImageRepository siteImageRepository;
 
-    public List<SiteImage> uploadSiteImages(Integer siteId, List<MultipartFile> images) throws IOException {
+    public record SiteImageUpload(MultipartFile file, String imageName) {}
+
+    public List<SiteImage> uploadSiteImages(Integer siteId, List<SiteImageUpload> uploads) throws IOException {
         List<SiteImage> saved = new ArrayList<>();
-        if (images == null || images.isEmpty()) {
+        if (uploads == null || uploads.isEmpty()) {
             return saved;
         }
-        for (MultipartFile image : images) {
+        for (SiteImageUpload upload : uploads) {
+            MultipartFile image = upload.file();
             if (image == null || image.isEmpty()) {
                 continue;
             }
@@ -39,6 +42,7 @@ public class SiteImageService {
             entity.setSiteId(siteId);
             entity.setUrl(url);
             entity.setFilename(image.getOriginalFilename());
+            entity.setNameImagem(upload.imageName());
             saved.add(siteImageRepository.save(entity));
         }
 
