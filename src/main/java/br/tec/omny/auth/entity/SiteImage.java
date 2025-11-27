@@ -1,26 +1,80 @@
 package br.tec.omny.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tblsite_images")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "tblsiteimages")
 public class SiteImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "siteimage_id")
+    private Integer siteImageId;
 
     @Column(name = "site_id", nullable = false)
     private Integer siteId;
 
-    @Column(name = "url", nullable = false, length = 500)
+    @Column(name = "url", columnDefinition = "TEXT")
     private String url;
+
+    @Column(name = "filename", length = 255)
+    private String filename;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public Integer getSiteImageId() {
+        return siteImageId;
+    }
+
+    public void setSiteImageId(Integer siteImageId) {
+        this.siteImageId = siteImageId;
+    }
+
+    public Integer getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }
-
-
