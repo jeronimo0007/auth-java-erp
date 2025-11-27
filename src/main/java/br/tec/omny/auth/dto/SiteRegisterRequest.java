@@ -115,6 +115,9 @@ public class SiteRegisterRequest {
     // reCAPTCHA
     private String recaptchaToken;
 
+    private String message;
+    private String type;
+
     private String productId;
     private String afm;
     private String userAgent;
@@ -495,6 +498,22 @@ public class SiteRegisterRequest {
 
     public void setRecaptchaToken(String recaptchaToken) {
         this.recaptchaToken = recaptchaToken;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getProductId() {

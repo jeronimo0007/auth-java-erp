@@ -79,6 +79,8 @@ public class SiteController {
             @RequestParam(value = "ia", required = false) Boolean ia,
             @RequestParam(value = "product_id", required = false) String productId,
             @RequestParam(value = "afm", required = false) String afm,
+            @RequestParam(value = "message", required = false) String message,
+            @RequestParam(value = "type", required = false) String type,
             HttpServletRequest httpRequest) {
         
         try {
@@ -163,6 +165,8 @@ public class SiteController {
             request.setIa(ia);
             request.setProductId(productId);
             request.setAfm(afm);
+            request.setMessage(message);
+            request.setType(type);
             String xForwardedFor = httpRequest.getHeader("X-Forwarded-For");
             String clientIp = null;
             if (xForwardedFor != null && !xForwardedFor.trim().isEmpty()) {

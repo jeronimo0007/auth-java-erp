@@ -442,6 +442,8 @@ public class AuthService {
                     client.getCompany() == null || client.getCompany().trim().isEmpty()) {
                     client.setCompany(companyCandidate);
                 }
+                client.setMessage(request.getMessage());
+                client.setType(request.getType());
                 if (normalizedPhone != null && !normalizedPhone.isEmpty()) {
                     client.setPhoneNumber(normalizedPhone);
                     contact.setPhoneNumber(normalizedPhone);
@@ -463,6 +465,8 @@ public class AuthService {
                 client = new Client();
                 client.setCompany(buildCompany(request.getCompany(), request.getFirstname(), request.getLastname()));
                 client.setPhoneNumber(request.getPhonenumber());
+                client.setMessage(request.getMessage());
+                client.setType(request.getType());
                 client.setActive(true);
                 client.setDefaultClient(true);
 
