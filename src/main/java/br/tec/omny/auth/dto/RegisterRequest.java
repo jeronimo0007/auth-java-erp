@@ -27,6 +27,10 @@ public class RegisterRequest {
     private String city;
     private String state;
     private String address;
+
+    private String afm;
+    private String type;
+    private String message;
     
     // reCAPTCHA
     private String recaptchaToken;
@@ -139,6 +143,30 @@ public class RegisterRequest {
     
     public void setRecaptchaToken(String recaptchaToken) {
         this.recaptchaToken = recaptchaToken;
+    }
+
+    public String getAfm() {
+        return afm;
+    }
+
+    public void setAfm(String afm) {
+        this.afm = afm;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
 
