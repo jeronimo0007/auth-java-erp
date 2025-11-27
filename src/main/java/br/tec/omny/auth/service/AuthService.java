@@ -933,6 +933,7 @@ public class AuthService {
         Task task = new Task();
         task.setName(type);
         task.setDescription("Criar Site do cliente conforme condicoes");
+        task.setDescription("Mensagem: "+ client.getMessage());
         task.setStartDate(LocalDate.now());
         task.setAddedFrom(1);
         task.setStatus(1);
