@@ -41,8 +41,6 @@ public class FileUploadService {
     @Value("${app.upload.max-file-bytes:5242880}")
     private long maxFileBytes;
 
-    @Value("${app.upload.max-file-count:20}")
-    private int maxFileCount;
 
     @Value("${app.upload.allowed-types:image/jpeg,image/png,image/webp,application/pdf}")
     private String allowedTypesCsv;
@@ -120,11 +118,6 @@ public class FileUploadService {
         List<String> urls = new ArrayList<>();
         if (files == null) return urls;
 
-        if (files.size() > maxFileCount) {
-            throw new IllegalArgumentException(
-                "Quantidade de arquivos excede o limite: " + files.size() + " (máx " + maxFileCount + ")"
-            );
-        }
         for (MultipartFile file : files) {
             String url = uploadFile(file, keyPrefix);
             if (url != null) {

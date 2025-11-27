@@ -17,6 +17,12 @@ public class Client {
     
     @Column(name = "phonenumber")
     private String phoneNumber;
+
+    @Column(name = "message", length = 255)
+    private String message;
+
+    @Column(name = "type", length = 50)
+    private String type;
     
 
     
@@ -74,6 +80,22 @@ public class Client {
     
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
     
 
