@@ -158,7 +158,7 @@ public class AuthService {
         // Salva o contato
         contact = contactRepository.save(contact);
         
-        maybeCreateReferral(request.getAfm(), client, true);
+        maybeCreateReferral(request.getAfm(), client, true, null, null);
         if (StringUtils.hasText(request.getType())) {
             createProjectForType(client, request.getType());
         }
@@ -167,10 +167,6 @@ public class AuthService {
         if (contact.getId() != null) {
             // Agenda o email para ser enviado APÓS o commit da transação
             scheduleEmailAfterCommit(contact.getId());
-        }
-        maybeCreateReferral(request.getAfm(), client, true, null, null);
-        if (StringUtils.hasText(request.getType())) {
-            createProjectForType(client, request.getType());
         }
         
         return client;
@@ -928,6 +924,7 @@ public class AuthService {
         project.setBillingType(1);
         project.setStartDate(LocalDate.now());
         project.setAddedFrom(1);
+        project.setStatus(1);
         project = projectRepository.save(project);
 
         Task task = new Task();
