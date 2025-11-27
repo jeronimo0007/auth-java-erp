@@ -31,6 +31,12 @@ public class Site {
     @Column(name = "tipo_site", nullable = false, length = 50)
     private String tipoSite;
 
+    @Column(name = "product_id", length = 50)
+    private String productId;
+
+    @Column(name = "afm", length = 255)
+    private String afm;
+
     @Column(name = "descricao_negocio", columnDefinition = "TEXT")
     private String descricaoNegocio;
 
