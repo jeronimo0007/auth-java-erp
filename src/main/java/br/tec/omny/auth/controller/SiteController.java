@@ -7,6 +7,7 @@ import br.tec.omny.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -75,7 +76,12 @@ public class SiteController {
             @RequestParam(value = "type_site", required = false) String typeSite,
             @RequestParam(value = "user_id", required = false) String userIdStr,
             @RequestParam(value = "recaptchaToken", required = false) String recaptchaToken,
-            @RequestParam(value = "ia", required = false) Boolean ia) {
+            @RequestParam(value = "ia", required = false) Boolean ia,
+            @RequestParam(value = "product_id", required = false) String productId,
+            @RequestParam(value = "afm", required = false) String afm,
+            @RequestParam(value = "message", required = false) String message,
+            @RequestParam(value = "type", required = false) String type,
+            HttpServletRequest httpRequest) {
         
         try {
             // Cria o objeto de request
@@ -157,6 +163,19 @@ public class SiteController {
             request.setPassword(password);
             request.setRecaptchaToken(recaptchaToken);
             request.setIa(ia);
+            request.setProductId(productId);
+            request.setAfm(afm);
+            request.setMessage(message);
+            request.setType(type);
+            String xForwardedFor = httpRequest.getHeader("X-Forwarded-For");
+            String clientIp = null;
+            if (xForwardedFor != null && !xForwardedFor.trim().isEmpty()) {
+                clientIp = xForwardedFor.split(",")[0].trim();
+            } else {
+                clientIp = httpRequest.getRemoteAddr();
+            }
+            request.setClientIp(clientIp);
+            request.setUserAgent(httpRequest.getHeader("User-Agent"));
             
             Client client = authService.registerSite(request);
             

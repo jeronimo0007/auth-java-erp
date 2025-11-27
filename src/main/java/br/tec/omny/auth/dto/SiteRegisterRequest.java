@@ -114,6 +114,14 @@ public class SiteRegisterRequest {
     
     // reCAPTCHA
     private String recaptchaToken;
+
+    private String message;
+    private String type;
+
+    private String productId;
+    private String afm;
+    private String userAgent;
+    private String clientIp;
     
     // Flag para controlar envio para fila RabbitMQ
     private Boolean ia;
@@ -487,9 +495,57 @@ public class SiteRegisterRequest {
     public String getRecaptchaToken() {
         return recaptchaToken;
     }
-    
+
     public void setRecaptchaToken(String recaptchaToken) {
         this.recaptchaToken = recaptchaToken;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getAfm() {
+        return afm;
+    }
+
+    public void setAfm(String afm) {
+        this.afm = afm;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public String getClientIp() {
+        return clientIp;
+    }
+
+    public void setClientIp(String clientIp) {
+        this.clientIp = clientIp;
     }
     
     public Boolean getIa() {
