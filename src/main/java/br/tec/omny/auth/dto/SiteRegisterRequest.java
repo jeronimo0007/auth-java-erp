@@ -1,5 +1,6 @@
 package br.tec.omny.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,18 +13,23 @@ public class SiteRegisterRequest {
     @Email(message = "Email deve ter um formato válido")
     private String email;
     
+    @JsonAlias({"phoneNumber", "phone_number"})
     private String phonenumber;
     
     private String company;
     
+    @JsonAlias("nome_site")
     private String nomeSite;
     
     private String dominio;
     
+    @JsonAlias("descricao_negocio")
     private String descricaoNegocio;
     
+    @JsonAlias("publico_alvo")
     private String publicoAlvo;
     
+    @JsonAlias("banner_texto")
     private String bannerTexto;
     
     
@@ -35,6 +41,7 @@ public class SiteRegisterRequest {
     // Favicon opcional
     private org.springframework.web.multipart.MultipartFile favicon;
     
+    @JsonAlias("tipo_site")
     private String tipoSite;
     
     private String quemSomos;
@@ -48,47 +55,62 @@ public class SiteRegisterRequest {
     private String logoOpcao;
     
     @Email(message = "Email desejado deve ter um formato válido")
+    @JsonAlias("email_desejado")
     private String emailDesejado;
     
+    @JsonAlias("banner_opcao")
     private String bannerOpcao;
     
     
     
+    @JsonAlias("banner_ia_descricao")
     private String bannerIaDescricao;
     
     
     
+    @JsonAlias("banner_profissional_descricao")
     private String bannerProfissionalDescricao;
     
     
     
     @Email(message = "Email da empresa deve ter um formato válido")
+    @JsonAlias("email_empresa")
     private String emailEmpresa;
     
+    @JsonAlias("telefone_empresa")
     private String telefoneEmpresa;
     
+    @JsonAlias("endereco_empresa")
     private String enderecoEmpresa;
     
+    @JsonAlias("secao1_titulo")
     private String secao1Titulo;
     
+    @JsonAlias("secao1_conteudo")
     private String secao1Conteudo;
     
+    @JsonAlias("secao2_titulo")
     private String secao2Titulo;
     
+    @JsonAlias("secao2_conteudo")
     private String secao2Conteudo;
     
     private MultipartFile logo;
     
+    @JsonAlias("cor_principal")
     private String corPrincipal;
     
+    @JsonAlias("cor_secundaria")
     private String corSecundaria;
     
     private String estilo;
     
     private String observacoes;
     
+    @JsonAlias("firstName")
     private String firstname;
     
+    @JsonAlias("lastName")
     private String lastname;
     
     private String facebook;
@@ -105,8 +127,10 @@ public class SiteRegisterRequest {
     private String preference;
     
     @NotBlank(message = "Descrição do site é obrigatória quando preference é 'descricao'", groups = {ValidationGroups.DescriptionRequired.class})
+    @JsonAlias("description_site")
     private String descriptionSite;
     
+    @JsonAlias("tipo_site")
     private String typeSite;
     private Long userId; // Para validar se cliente já existe
     
@@ -118,6 +142,7 @@ public class SiteRegisterRequest {
     private String message;
     private String type;
 
+    @JsonAlias("product_id")
     private String productId;
     private String afm;
     private String userAgent;

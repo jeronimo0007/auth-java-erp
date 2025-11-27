@@ -5,6 +5,7 @@ import br.tec.omny.auth.dto.AdminLoginResponse;
 import br.tec.omny.auth.dto.ClientInfoResponse;
 import br.tec.omny.auth.dto.LoginRequest;
 import br.tec.omny.auth.dto.RegisterRequest;
+import br.tec.omny.auth.dto.SiteCreationResult;
 import br.tec.omny.auth.dto.SiteRegisterRequest;
 import br.tec.omny.auth.entity.Client;
 import br.tec.omny.auth.entity.Contact;
@@ -25,7 +26,6 @@ import br.tec.omny.auth.repository.SiteRepository;
 import br.tec.omny.auth.repository.StaffRepository;
 import br.tec.omny.auth.repository.TaskRepository;
 import br.tec.omny.auth.repository.WarehouseRepository;
-import br.tec.omny.auth.repository.SiteImageRepository;
 import br.tec.omny.auth.util.JwtUtil;
 import br.tec.omny.auth.util.PasswordHash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import java.util.concurrent.CompletableFuture;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -69,9 +67,6 @@ public class AuthService {
     
     @Autowired
     private SiteRepository siteRepository;
-    
-    @Autowired
-    private SiteImageRepository siteImageRepository;
 
     @Autowired
     private ContactPermissionRepository contactPermissionRepository;
@@ -82,8 +77,6 @@ public class AuthService {
     @Autowired
     private ReferralRepository referralRepository;
 
-    @Autowired
-    private FileUploadService fileUploadService;
     
     @Autowired
     private EmailService emailService;
@@ -307,7 +300,7 @@ public class AuthService {
      * @return Cliente criado
      * @throws Exception Se houver erro no registro
      */
-    public Client registerSite(SiteRegisterRequest request) throws Exception {
+    public SiteCreationResult registerSite(SiteRegisterRequest request) throws Exception {
         // Valida reCAPTCHA apenas se for cadastro novo (sem user_id) e se estiver habilitado
         if (recaptchaService.isEnabled() && request.getUserId() == null) {
             if (!recaptchaService.validateRecaptcha(request.getRecaptchaToken())) {
@@ -330,8 +323,11 @@ public class AuthService {
         // Verifica se já existe um contato registrado com o email informado
         Optional<Contact> existingEmailContact = Optional.empty();
         String normalizedEmail = request.getEmail() != null ? request.getEmail().trim() : null;
-        if (request.getUserId() == null && normalizedEmail != null && !normalizedEmail.isEmpty()) {
-            existingEmailContact = contactRepository.findByEmail(normalizedEmail);
+        if (normalizedEmail != null && !normalizedEmail.isEmpty()) {
+            request.setEmail(normalizedEmail);
+            if (request.getUserId() == null) {
+                existingEmailContact = contactRepository.findByEmailIgnoreCase(normalizedEmail);
+            }
         }
 
         // Validação de password obrigatório apenas quando não existe user_id e não estamos usando um contato já existente
@@ -400,11 +396,7 @@ public class AuthService {
                 }
                 
             } else {
-                // Cliente não existe - cria um novo cliente
-                // Verifica se o email já existe
-                if (request.getEmail() != null && contactRepository.existsByEmail(request.getEmail())) {
-                    throw new Exception("Email já está em uso");
-                }
+            // Cliente não existe - cria um novo cliente
                 
                 // Cria o cliente
                 client = new Client();
@@ -563,39 +555,6 @@ public class AuthService {
         // Salva o site
         site = siteRepository.save(site);
         
-        // Faz upload dos arquivos
-        String empresaImagemPath = uploadFileSafe(request.getEmpresaImagem(), "erp/sites/" + site.getSiteId() + "/empresa");
-        String logoPath = uploadFileSafe(request.getLogo(), "erp/sites/" + site.getSiteId() + "/logo");
-        String faviconUrl = uploadFileSafe(request.getFavicon(), "erp/sites/" + site.getSiteId() + "/favicon");
-        String bannerTextoImgUrl = uploadFileSafe(request.getBannerTextoImg(), "erp/sites/" + site.getSiteId() + "/banners");
-
-        if (faviconUrl != null) {
-            site.setFavicon(faviconUrl);
-        }
-        if (bannerTextoImgUrl != null) {
-            site.setBannerTextoImg(bannerTextoImgUrl);
-        }
-
-        List<String> servicosImagensPaths = uploadFilesSafe(request.getServicosImagens(), "erp/sites/" + site.getSiteId() + "/servicos");
-
-        // Atualiza o site com os caminhos dos arquivos
-        site.setEmpresaImagem(empresaImagemPath);
-        site.setLogo(logoPath);
-        if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
-            site.setServicosImagens(String.join(",", servicosImagensPaths));
-        }
-        siteRepository.save(site);
-
-        // Persiste imagens de serviços em tabela dedicada
-        if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
-            for (String url : servicosImagensPaths) {
-                br.tec.omny.auth.entity.SiteImage img = new br.tec.omny.auth.entity.SiteImage();
-                img.setSiteId(site.getSiteId());
-                img.setUrl(url);
-                siteImageRepository.save(img);
-            }
-        }
-
         // Cria o projeto
         Project project = new Project();
         project.setName("Projeto: " + request.getNomeSite() + "("+site.getSiteId()+")");
@@ -667,22 +626,7 @@ public class AuthService {
         projectDescription.append("• Cor Secundária: ").append(request.getCorSecundaria()).append("<br>");
         projectDescription.append("• Estilo: ").append(request.getEstilo()).append("<br><br>");
         
-        if (empresaImagemPath != null) {
-            projectDescription.append("• Imagem da Empresa: ").append(empresaImagemPath).append("<br>");
-        }
-        if (logoPath != null) {
-            projectDescription.append("• Logo: ").append(logoPath).append("<br>");
-        }
-        if (faviconUrl != null) {
-            projectDescription.append("• Favicon: ").append(faviconUrl).append("<br>");
-        }
-        if (bannerTextoImgUrl != null) {
-            projectDescription.append("• Banner Principal (imagem): ").append(bannerTextoImgUrl).append("<br>");
-        }
         
-        if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
-            projectDescription.append("• Imagens dos Serviços: ").append(String.join(", ", servicosImagensPaths)).append("<br>");
-        }
         
         if (request.getObservacoes() != null && !request.getObservacoes().trim().isEmpty()) {
             projectDescription.append("<br>OBSERVAÇÕES:<br>");
@@ -772,41 +716,33 @@ public class AuthService {
         taskDescription.append("   • Estilo: ").append(request.getEstilo()).append("<br><br>");
         
         taskDescription.append("5. ARQUIVOS FORNECIDOS:<br>");
-        if (empresaImagemPath != null) {
-            taskDescription.append("   • Imagem da Empresa: ").append(empresaImagemPath).append("<br>");
-        }
-        if (logoPath != null) {
-            taskDescription.append("   • Logo: ").append(logoPath).append("<br>");
-        }
-        if (faviconUrl != null) {
-            taskDescription.append("   • Favicon: ").append(faviconUrl).append("<br>");
-        }
-        if (bannerTextoImgUrl != null) {
-            taskDescription.append("   • Banner Principal (imagem): ").append(bannerTextoImgUrl).append("<br>");
-        }
         
-        if (servicosImagensPaths != null && !servicosImagensPaths.isEmpty()) {
-            taskDescription.append("   • Imagens dos Serviços: ").append(String.join(", ", servicosImagensPaths)).append("<br>");
-        }
         taskDescription.append("<br>");
         
         taskDescription.append("6. INSTRUÇÕES ESPECÍFICAS POR TIPO:<br>");
-        String tipoSite = request.getTipoSite().toLowerCase();
-        if (tipoSite.equals("site")) {
-            taskDescription.append("   • Criar um site institucional completo em PHP<br>");
-            taskDescription.append("   • Incluir todas as seções solicitadas no index.php<br>");
-            taskDescription.append("   • Focar em apresentação da empresa e serviços<br>");
-            taskDescription.append("   • Usar HTML, CSS e PHP no arquivo index.php<br>");
-        } else if (tipoSite.equals("curriculo")) {
-            taskDescription.append("   • Criar um site de currículo profissional em PHP<br>");
-            taskDescription.append("   • Focar em apresentação pessoal e experiência<br>");
-            taskDescription.append("   • Incluir seção de habilidades e formação<br>");
-            taskDescription.append("   • Design limpo e profissional no index.php<br>");
-        } else if (tipoSite.equals("cartao de visita")) {
-            taskDescription.append("   • Criar um site tipo cartão de visita digital em PHP<br>");
-            taskDescription.append("   • Design minimalista e direto<br>");
-            taskDescription.append("   • Focar em informações de contato<br>");
-            taskDescription.append("   • Página única com navegação suave no index.php<br>");
+        String tipoSiteRaw = request.getTipoSite();
+        if (StringUtils.hasText(tipoSiteRaw)) {
+            String tipoSite = tipoSiteRaw.toLowerCase();
+            if (tipoSite.equals("site")) {
+                taskDescription.append("   • Criar um site institucional completo em PHP<br>");
+                taskDescription.append("   • Incluir todas as seções solicitadas no index.php<br>");
+                taskDescription.append("   • Focar em apresentação da empresa e serviços<br>");
+                taskDescription.append("   • Usar HTML, CSS e PHP no arquivo index.php<br>");
+            } else if (tipoSite.equals("curriculo")) {
+                taskDescription.append("   • Criar um site de currículo profissional em PHP<br>");
+                taskDescription.append("   • Focar em apresentação pessoal e experiência<br>");
+                taskDescription.append("   • Incluir seção de habilidades e formação<br>");
+                taskDescription.append("   • Design limpo e profissional no index.php<br>");
+            } else if (tipoSite.equals("cartao de visita")) {
+                taskDescription.append("   • Criar um site tipo cartão de visita digital em PHP<br>");
+                taskDescription.append("   • Design minimalista e direto<br>");
+                taskDescription.append("   • Focar em informações de contato<br>");
+                taskDescription.append("   • Página única com navegação suave no index.php<br>");
+            } else {
+                taskDescription.append("   • Seguir o escopo definido sem tipo específico<br>");
+            }
+        } else {
+            taskDescription.append("   • Seguir o escopo padrão sem tipo específico<br>");
         }
         taskDescription.append("<br>");
         
@@ -937,14 +873,14 @@ public class AuthService {
         siteRepository.save(site);
         
         // Envia mensagem para fila MQ com site_id, client_id, contact_id e contexto exatamente igual ao da Task principal
-       /*
+        /*
         Integer clientIdInteger = null;
         if (client.getUserId() != null) {
             clientIdInteger = Integer.valueOf(client.getUserId().intValue());
         }
         queueService.sendSiteCreationMessage(site.getSiteId(), clientIdInteger, contact.getId(), taskDescription.toString(), request.getIa());
         */
-        return client;
+        return new SiteCreationResult(client, site);
     }
 
     private void maybeCreateReferral(SiteRegisterRequest request, Client client, boolean newClientCreated) {
@@ -1028,34 +964,6 @@ public class AuthService {
      * @return Informações básicas do cliente (company, email, phoneNumber)
      * @throws Exception Se o cliente não for encontrado
      */
-    private String uploadFileSafe(MultipartFile file, String keyPrefix) {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
-        try {
-            return fileUploadService.uploadFile(file, keyPrefix);
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
-
-    private List<String> uploadFilesSafe(List<MultipartFile> files, String keyPrefix) {
-        List<String> urls = new ArrayList<>();
-        if (files == null || files.isEmpty()) {
-            return urls;
-        }
-
-        for (MultipartFile file : files) {
-            String url = uploadFileSafe(file, keyPrefix);
-            if (url != null) {
-                urls.add(url);
-            }
-        }
-
-        return urls;
-    }
-
     public ClientInfoResponse getClientInfo(Long clientId) throws Exception {
         // Busca o cliente
         Optional<Client> clientOpt = clientRepository.findById(clientId);

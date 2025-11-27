@@ -17,6 +17,13 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     Optional<Contact> findByEmail(String email);
     
     /**
+     * Busca contato por email ignorando case
+     * @param email Email do contato
+     * @return Optional com o contato encontrado
+     */
+    Optional<Contact> findByEmailIgnoreCase(String email);
+    
+    /**
      * Verifica se existe um contato com o email informado
      * @param email Email a ser verificado
      * @return true se o email já existe
