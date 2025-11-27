@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.concurrent.CompletableFuture;
 
@@ -137,6 +138,8 @@ public class AuthService {
             request.getState(),
             request.getAddress()
         );
+        client.setMessage(request.getMessage());
+        client.setType(request.getType());
         
         // Salva o cliente
         client = clientRepository.save(client);
@@ -162,10 +165,19 @@ public class AuthService {
         // Salva o contato
         contact = contactRepository.save(contact);
         
+        maybeCreateReferral(request.getAfm(), client, true);
+        if (StringUtils.hasText(request.getType())) {
+            createProjectForType(client, request.getType());
+        }
+
         // Verifica se o cadastro foi salvo com sucesso antes de enviar email
         if (contact.getId() != null) {
             // Agenda o email para ser enviado APÓS o commit da transação
             scheduleEmailAfterCommit(contact.getId());
+        }
+        maybeCreateReferral(request.getAfm(), client, true, null, null);
+        if (StringUtils.hasText(request.getType())) {
+            createProjectForType(client, request.getType());
         }
         
         return client;
@@ -944,18 +956,54 @@ public class AuthService {
             return;
         }
 
+        maybeCreateReferral(afmSlug, client, newClientCreated, request.getUserAgent(), request.getClientIp());
+    }
+
+    private void maybeCreateReferral(String afmSlug, Client client, boolean newClientCreated) {
+        maybeCreateReferral(afmSlug, client, newClientCreated, null, null);
+    }
+
+    private void maybeCreateReferral(String afmSlug, Client client, boolean newClientCreated, String userAgent, String clientIp) {
+        if (!newClientCreated || !StringUtils.hasText(afmSlug)) {
+            return;
+        }
+
         affiliateRepository.findByAffiliateSlug(afmSlug.trim()).ifPresent(affiliate -> {
             Long userId = client.getUserId();
             if (userId == null) {
                 return;
             }
+            if (referralRepository.findByClientId(userId.intValue()).isPresent()) {
+                return;
+            }
             Referral referral = new Referral();
             referral.setAffiliateId(affiliate.getAffiliateId());
             referral.setClientId(userId.intValue());
-            referral.setUa("");
-            referral.setIp("127.0.0.1");
+            referral.setUa(userAgent != null ? userAgent : "");
+            referral.setIp(clientIp != null ? clientIp : "");
             referralRepository.save(referral);
         });
+    }
+
+    private void createProjectForType(Client client, String type) {
+        Project project = new Project();
+        project.setName(type);
+        project.setClientId(client.getUserId().intValue());
+        project.setBillingType(1);
+        project.setStartDate(LocalDate.now());
+        project.setAddedFrom(1);
+        project = projectRepository.save(project);
+
+        Task task = new Task();
+        task.setName(type);
+        task.setDescription("Criar Site do cliente conforme condicoes");
+        task.setStartDate(LocalDate.now());
+        task.setAddedFrom(1);
+        task.setStatus(1);
+        task.setBillable(true);
+        task.setRelId(project.getId());
+        task.setRelType("project");
+        taskRepository.save(task);
     }
 
     private void assignDefaultContactPermissions(Contact contact) {
