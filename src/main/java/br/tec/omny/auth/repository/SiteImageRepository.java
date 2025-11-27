@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface SiteImageRepository extends JpaRepository<SiteImage, Integer> {
+
     List<SiteImage> findBySiteId(Integer siteId);
 }
-
-
