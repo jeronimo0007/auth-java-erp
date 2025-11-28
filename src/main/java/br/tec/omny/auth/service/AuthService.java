@@ -634,6 +634,10 @@ public class AuthService {
         // Salva o projeto
         project = projectRepository.save(project);
         
+        // Atualiza o site com o project_id
+        site.setProjectId(project.getId());
+        site = siteRepository.save(site);
+        
         // Cria a task principal
         Task task = new Task();
         task.setName("Criação do Site");

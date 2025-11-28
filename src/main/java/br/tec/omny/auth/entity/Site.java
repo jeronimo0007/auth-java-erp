@@ -22,6 +22,9 @@ public class Site {
     @Column(name = "client_id", nullable = false)
     private Integer clientId;
 
+    @Column(name = "project_id")
+    private Integer projectId;
+
     @Column(name = "nome_site", nullable = false, length = 255)
     private String nomeSite;
 
